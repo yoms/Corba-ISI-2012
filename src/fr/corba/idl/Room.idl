@@ -1,0 +1,39 @@
+module fr {
+module corba {
+module idl {
+module Code {
+
+	exception NameAlreadyUsed {};
+	exception UnknownID {};
+	exception NotAllowed {};
+	
+	interface User{
+		void receiveRoom(in Object room);
+		void receiveChatMessage(in string nick, in string text);
+		void receiveMoved(in string nick, in short x, in short y);
+	};
+	
+	interface Admin : User{
+		void receiveExistingAvatars(in Object list);
+		void receiveIsKicked(in boolean kicked);
+		void receiveRoomContent(in Object room);
+		void receiveConnectedUsers(in Object list);
+	};
+	interface Server
+	{
+		string subscribe(in string nick, in User c)	raises (NameAlreadyUsed);
+		void unsubscribe(in string myId) raises (UnknownID);
+		void requestMove(in short x, in short y);
+		void changeRoom(in string myId);
+		void comment(in string myId, in string text) raises (UnknownID);
+		
+		void requestExistingAvatars(in string myId) raises (NotAllowed);
+		void requestKick(in string myId, in string kickedNick) raises (NotAllowed);
+		void requestRoomContent(in string myId, in string roomName) raises (NotAllowed);
+		void requestConnectedUsers(in string myId) raises (NotAllowed);
+	};
+
+};
+};
+};
+};

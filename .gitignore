@@ -1,0 +1,5 @@
+bin
+.classpath
+.project
+src/fr/corba/idl/chat
+src/fr/corba/idl/Code
