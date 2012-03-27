@@ -6,12 +6,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
-import fr.corba.idl.chat.ChatClient;
-import fr.corba.idl.chat.ChatServerPOA;
-import fr.corba.idl.chat.NameAlreadyUsed;
-import fr.corba.idl.chat.UnknownID;
+import fr.corba.idl.Code.NameAlreadyUsed;
+import fr.corba.idl.Code.ServerPOA;
+import fr.corba.idl.Code.UnknownID;
 
-public class ServerPOAImpl extends ChatServerPOA {
+public class ServerPOAImpl extends ServerPOA {
 
 	protected class Client {
 		public ChatClient chatclient;
