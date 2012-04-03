@@ -1,1 +1,3 @@
-Mise à jour de mon nom.
+tnameserv -J-Djava.net.preferIPv4Stack=true -ORBInitialPort 5000
+
+main : -ORBInitRef NameService=corbaloc::localhost:5000/NameService
