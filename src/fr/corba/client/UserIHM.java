@@ -104,6 +104,7 @@ public class UserIHM {
 		JTextPane chatHistory = new JTextPane();
 		chatPanel.add(chatHistory);
 		userPoa.setChatHistory(chatHistory);
+		chatHistory.setEditable(false);
 		
 		JPanel sendPanel = new JPanel();
 		chatPanel.add(sendPanel);
