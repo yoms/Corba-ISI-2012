@@ -6,6 +6,8 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -18,8 +20,10 @@ import javax.swing.SwingConstants;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 
+import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.Server;
 import fr.corba.idl.Code.ServerHelper;
+import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
 
 public class UserIHM {
@@ -31,6 +35,17 @@ public class UserIHM {
 	private User user;
 	private UserPOAImpl userPoa;
 	private String nick;
+	private Canvas canvas;
+	private JTextPane chatHistory;
+	private ConnectionDialog connectDialog;
+
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
 
 	/**
 	 * Launch the application.
@@ -49,7 +64,6 @@ public class UserIHM {
 	}
 
 	private void initializeORB(String[] args) {
-		nick = new String("test");
 		try {
 			// TODO Auto-generated method stub
 			UserRunnable.orb = ORB.init(args, null);
@@ -65,19 +79,28 @@ public class UserIHM {
 			userPoa = new UserPOAImpl();
 			// connecting servant to ORB
 			user = userPoa._this(UserRunnable.orb);
-			userRunnableThread = new Thread(new UserRunnable());
-			UserRunnable.id = server.subscribe(nick, user);
-			userRunnableThread.start();
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
 	}
-	
+	public void subscribe(){
+
+		userRunnableThread = new Thread(new UserRunnable());
+		try {
+			UserRunnable.id = server.subscribe(nick, user);
+			userPoa.setChatHistory(chatHistory);
+		} catch (NameAlreadyUsed e) {
+			// TODO Auto-generated catch block
+			connectDialog.setVisible(true);
+		}
+		userRunnableThread.start();
+	}
 	/**
 	 * Create the application.
 	 * @param args 
 	 */
 	public UserIHM(String[] args) {
+		connectDialog = new ConnectionDialog(this);
 		initializeORB(args);
 		initialize();
 	}
@@ -90,20 +113,68 @@ public class UserIHM {
 		frame.setBounds(100, 100, 836, 605);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
+		frame.addWindowListener(new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				  try {
+					server.unsubscribe(UserRunnable.id);
+				} catch (UnknownID e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		JPanel worldPanel = new JPanel();
 		frame.getContentPane().add(worldPanel);
 		
-		Canvas canvas = new Canvas();
+		canvas = new Canvas();
 		worldPanel.add(canvas);
 		
 		JPanel chatPanel = new JPanel();
 		frame.getContentPane().add(chatPanel);
 		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 		
-		JTextPane chatHistory = new JTextPane();
+		chatHistory = new JTextPane();
 		chatPanel.add(chatHistory);
-		userPoa.setChatHistory(chatHistory);
 		chatHistory.setEditable(false);
 		
 		JPanel sendPanel = new JPanel();
@@ -123,6 +194,7 @@ public class UserIHM {
 				// TODO Auto-generated method stub
 				try {
 						server.comment(UserRunnable.id, chatTextBox.getText());
+						chatTextBox.setText("");
 					}
 				catch (Exception exp) {
 					// TODO: handle exception
