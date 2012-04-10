@@ -3,6 +3,8 @@ package fr.corba.client;
 import java.awt.Canvas;
 
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyledDocument;
 
 import org.omg.CORBA.Object;
 
@@ -10,6 +12,15 @@ import fr.corba.idl.Code.UserPOA;
 
 public class UserPOAImpl extends UserPOA {
 	private JTextPane chatHistory;
+	private String nick;
+
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
 
 	public JTextPane getChatHistory() {
 		return chatHistory;
@@ -38,13 +49,20 @@ public class UserPOAImpl extends UserPOA {
 	@Override
 	public void receiveChatMessage(String nick, String text) {
 		// TODO Auto-generated method stub
-		System.out.println("receiveChatMessage(String nick, String text)");
+		System.out.println("receiveChatMessage("+nick+", "+text+")");
 		if (chatHistory == null)
 			return;
-		StringBuffer textBuffer = new StringBuffer(chatHistory.getText());
-		textBuffer.append("<" + nick + ">:" + text + "\n");
-		chatHistory.setText(textBuffer.toString());
-
+		
+		if(!this.getNick().equalsIgnoreCase(nick)) {
+			StyledDocument doc = chatHistory.getStyledDocument();
+			try {
+				doc.insertString(doc.getLength(), nick + " a écrit : \n", doc.getStyle("AEcrit"));
+				doc.insertString(doc.getLength(), text+"\n", doc.getStyle("Ecrit"));
+			} catch (BadLocationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override

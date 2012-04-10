@@ -19,6 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
@@ -37,17 +40,7 @@ public class UserIHM {
 	private Server server;
 	private User user;
 	private UserPOAImpl userPoa;
-	private String nick = "";
 	private Canvas canvas;
-	private JTextPane chatHistory;
-
-	public String getNick() {
-		return nick;
-	}
-
-	public void setNick(String nick) {
-		this.nick = nick;
-	}
 
 	/**
 	 * Launch the application.
@@ -90,8 +83,7 @@ public class UserIHM {
 	public boolean subscribe() {
 		userRunnableThread = new Thread(new UserRunnable());
 		try {
-			UserRunnable.id = server.subscribe(nick, user);
-			userPoa.setChatHistory(chatHistory);
+			UserRunnable.id = server.subscribe(this.userPoa.getNick(), user);
 			userRunnableThread.start();
 		} catch (NameAlreadyUsed e) {
 			// TODO Auto-generated catch block
@@ -102,11 +94,13 @@ public class UserIHM {
 	}
 
 	public void connectionDialog() {
-		while (this.getNick() != null && this.getNick().trim().equalsIgnoreCase("")) {
-			this.setNick(JOptionPane.showInputDialog(null, "User name", "Server Connection Dialog", JOptionPane.QUESTION_MESSAGE));
-			if (this.getNick() != null) {
+		String nick = "";
+		while (nick != null && nick.trim().equalsIgnoreCase("")) {
+			nick = JOptionPane.showInputDialog(null, "User name", "Server Connection Dialog", JOptionPane.QUESTION_MESSAGE);
+			this.userPoa.setNick(nick);
+			if (this.userPoa.getNick() != null) {
 				if (!this.subscribe()) {
-					this.setNick("");
+					nick = "";
 				}
 			}
 		}
@@ -120,8 +114,9 @@ public class UserIHM {
 	public UserIHM(String[] args) {
 		initializeORB(args);
 		this.connectionDialog();
-		if (this.getNick() != null) {
+		if (this.userPoa.getNick() != null) {
 			initialize();
+			System.out.println("Chat de "+ this.userPoa.getNick());
 		}
 	}
 
@@ -129,7 +124,7 @@ public class UserIHM {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		frame = new JFrame(this.userPoa.getNick());
 		frame.setBounds(100, 100, 836, 605);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
@@ -193,10 +188,22 @@ public class UserIHM {
 		frame.getContentPane().add(chatPanel);
 		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
-		chatHistory = new JTextPane();
+		JTextPane chatHistory = new JTextPane();
 		chatPanel.add(chatHistory);
 		chatHistory.setEditable(false);
-
+		StyledDocument doc = chatHistory.getStyledDocument();
+		
+	    Style style = doc.addStyle("AEcrit", null);
+	    StyleConstants.setItalic(style, true);
+	    StyleConstants.setFontFamily(style, "SansSerif");
+	    StyleConstants.setFontSize(style, 16);
+	    
+	    style = doc.addStyle("Ecrit", null);
+	    StyleConstants.setItalic(style, false);
+	    StyleConstants.setFontFamily(style, "SansSerif");
+	    StyleConstants.setFontSize(style, 14);
+		userPoa.setChatHistory(chatHistory);
+	    
 		JPanel sendPanel = new JPanel();
 		chatPanel.add(sendPanel);
 		sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
@@ -212,6 +219,9 @@ public class UserIHM {
 				if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
 					try {
 						server.comment(UserRunnable.id, chatTextBox.getText());
+						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
+						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
+						doc.insertString(doc.getLength(), chatTextBox.getText()+"\n", doc.getStyle("Ecrit"));
 						chatTextBox.setText("");
 					} catch (Exception exp) {
 						// TODO: handle exception
@@ -228,6 +238,9 @@ public class UserIHM {
 					// TODO Auto-generated method stub
 					try {
 						server.comment(UserRunnable.id, chatTextBox.getText());
+						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
+						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
+						doc.insertString(doc.getLength(), chatTextBox.getText()+"\n", doc.getStyle("Ecrit"));
 						chatTextBox.setText("");
 					} catch (Exception exp) {
 						// TODO: handle exception
