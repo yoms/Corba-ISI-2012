@@ -38,7 +38,7 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	public void unsubscribe(String id) throws UnknownID {
-		System.out.println("unsubscribe: " + id);
+		System.out.println("unsubscribe: " + clients.get(id).nick + " -> " + id);
 		Client c = clients.remove(id);
 		if (c == null)
 			throw new UnknownID();
@@ -58,36 +58,36 @@ public class ServerPOAImpl extends ServerPOA {
 	@Override
 	public void requestMove(short x, short y) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void changeRoom(String myId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void requestExistingAvatars(String myId) throws NotAllowed {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void requestKick(String myId, String kickedNick) throws NotAllowed {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void requestRoomContent(String myId, String roomName) throws NotAllowed {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void requestConnectedUsers(String myId) throws NotAllowed {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

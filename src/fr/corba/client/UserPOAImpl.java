@@ -1,4 +1,5 @@
 package fr.corba.client;
+
 import java.awt.Canvas;
 
 import javax.swing.JTextPane;
@@ -7,8 +8,9 @@ import org.omg.CORBA.Object;
 
 import fr.corba.idl.Code.UserPOA;
 
-public class UserPOAImpl extends UserPOA{
+public class UserPOAImpl extends UserPOA {
 	private JTextPane chatHistory;
+
 	public JTextPane getChatHistory() {
 		return chatHistory;
 	}
@@ -37,20 +39,19 @@ public class UserPOAImpl extends UserPOA{
 	public void receiveChatMessage(String nick, String text) {
 		// TODO Auto-generated method stub
 		System.out.println("receiveChatMessage(String nick, String text)");
-		if(chatHistory == null)
+		if (chatHistory == null)
 			return;
 		StringBuffer textBuffer = new StringBuffer(chatHistory.getText());
-		textBuffer.append("<"+nick+">:"+text+"\n");
+		textBuffer.append("<" + nick + ">:" + text + "\n");
 		chatHistory.setText(textBuffer.toString());
-		
-		
+
 	}
 
 	@Override
 	public void receiveMoved(String nick, short x, short y) {
 		// TODO Auto-generated method stub
 		System.out.println("receiveMoved(String nick, short x, short y)");
-		
+
 	}
 
 }

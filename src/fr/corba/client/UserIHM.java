@@ -4,6 +4,8 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -55,7 +57,7 @@ public class UserIHM {
 			public void run() {
 				try {
 					UserIHM window = new UserIHM(args);
-					if(window.frame != null)
+					if (window.frame != null)
 						window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -71,11 +73,11 @@ public class UserIHM {
 			// getting NameService
 			org.omg.CORBA.Object obj = UserRunnable.orb.resolve_initial_references("NameService");
 			NamingContextExt ncRef = org.omg.CosNaming.NamingContextExtHelper.narrow(obj);
-			
+
 			// resolving servant name
 			obj = ncRef.resolve_str("chatserver_yzioaw");
 			server = ServerHelper.narrow(obj);
-			
+
 			// creating servant
 			userPoa = new UserPOAImpl();
 			// connecting servant to ORB
@@ -84,9 +86,8 @@ public class UserIHM {
 			e.printStackTrace(System.out);
 		}
 	}
-	
-	public boolean subscribe(){
 
+	public boolean subscribe() {
 		userRunnableThread = new Thread(new UserRunnable());
 		try {
 			UserRunnable.id = server.subscribe(nick, user);
@@ -99,26 +100,27 @@ public class UserIHM {
 		}
 		return true;
 	}
-	
+
 	public void connectionDialog() {
-		while(this.getNick() != null && this.getNick().trim().equalsIgnoreCase("")){
+		while (this.getNick() != null && this.getNick().trim().equalsIgnoreCase("")) {
 			this.setNick(JOptionPane.showInputDialog(null, "User name", "Server Connection Dialog", JOptionPane.QUESTION_MESSAGE));
-			if(this.getNick() != null) {
-				if(!this.subscribe()) {
+			if (this.getNick() != null) {
+				if (!this.subscribe()) {
 					this.setNick("");
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Create the application.
-	 * @param args 
+	 * 
+	 * @param args
 	 */
 	public UserIHM(String[] args) {
 		initializeORB(args);
 		this.connectionDialog();
-		if(this.getNick() != null) {
+		if (this.getNick() != null) {
 			initialize();
 		}
 	}
@@ -132,98 +134,122 @@ public class UserIHM {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
 		frame.addWindowListener(new WindowListener() {
-			
+
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void windowIconified(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void windowDeiconified(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void windowDeactivated(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void windowClosing(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				  try {
+				try {
 					server.unsubscribe(UserRunnable.id);
 				} catch (UnknownID e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			
+
 			@Override
 			public void windowClosed(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void windowActivated(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		JPanel worldPanel = new JPanel();
 		frame.getContentPane().add(worldPanel);
-		
+
 		canvas = new Canvas();
 		worldPanel.add(canvas);
-		
+
 		JPanel chatPanel = new JPanel();
 		frame.getContentPane().add(chatPanel);
 		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-		
+
 		chatHistory = new JTextPane();
 		chatPanel.add(chatHistory);
 		chatHistory.setEditable(false);
-		
+
 		JPanel sendPanel = new JPanel();
 		chatPanel.add(sendPanel);
 		sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
-		
+
 		chatTextBox = new JTextField();
 		sendPanel.add(chatTextBox);
 		chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
 		chatTextBox.setMaximumSize(new Dimension(1250, 500));
 		chatTextBox.setColumns(10);
-		
+		chatTextBox.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				int key = e.getKeyCode();
+				if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
+					try {
+						server.comment(UserRunnable.id, chatTextBox.getText());
+						chatTextBox.setText("");
+					} catch (Exception exp) {
+						// TODO: handle exception
+					}
+				}
+			}
+		});
+
 		JButton sendButton = new JButton("Send");
 		sendPanel.add(sendButton);
 		sendButton.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				try {
+				if(!chatTextBox.getText().trim().equalsIgnoreCase("")) {
+					// TODO Auto-generated method stub
+					try {
 						server.comment(UserRunnable.id, chatTextBox.getText());
 						chatTextBox.setText("");
-					}
-				catch (Exception exp) {
-					// TODO: handle exception
+					} catch (Exception exp) {
+						// TODO: handle exception
+					}					
 				}
-				
 			}
-			public void mouseEntered(MouseEvent arg0) {}
-			public void mouseExited(MouseEvent arg0) {}
-			public void mousePressed(MouseEvent arg0) {}
-			public void mouseReleased(MouseEvent arg0) {}
+
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			public void mouseReleased(MouseEvent arg0) {
+			}
 		});
+		frame.setVisible(true);
+		chatTextBox.requestFocusInWindow();
+		chatTextBox.requestFocus();
 	}
 
 }
