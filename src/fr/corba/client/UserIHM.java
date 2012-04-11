@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
@@ -88,6 +89,8 @@ public class UserIHM {
 		} catch (NameAlreadyUsed e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "Nom déjà existant", "Erreur", JOptionPane.ERROR_MESSAGE);
+			this.userPoa.setNick(null);
+			this.userPoa.setMdp(null);
 			return false;
 		}
 		return true;
@@ -95,12 +98,20 @@ public class UserIHM {
 
 	public void connectionDialog() {
 		String nick = "";
-		while (nick != null && nick.trim().equalsIgnoreCase("")) {
-			nick = JOptionPane.showInputDialog(null, "User name", "Server Connection Dialog", JOptionPane.QUESTION_MESSAGE);
-			this.userPoa.setNick(nick);
-			if (this.userPoa.getNick() != null) {
+		char[] mdp = null;
+		int cancel = 0;
+		JTextField utilisateur = new JTextField();
+		JPasswordField passe = new JPasswordField();
+		while (cancel != -1 && cancel != 2 && (nick == null || nick.equalsIgnoreCase("") || mdp == null || mdp.toString().equalsIgnoreCase(""))) {
+			cancel = JOptionPane.showOptionDialog(null, new Object[] { "Identifiant :", utilisateur, "Mot de passe :", passe }, "Connexion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+			nick = utilisateur.getText();
+			mdp = passe.getPassword();
+			if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
+				this.userPoa.setNick(nick);
+				this.userPoa.setMdp(mdp);
 				if (!this.subscribe()) {
 					nick = "";
+					mdp = new char[0];
 				}
 			}
 		}
@@ -114,9 +125,9 @@ public class UserIHM {
 	public UserIHM(String[] args) {
 		initializeORB(args);
 		this.connectionDialog();
-		if (this.userPoa.getNick() != null) {
+		if (this.userPoa.getNick() != null && this.userPoa.getMdp() != null) {
 			initialize();
-			System.out.println("Chat de "+ this.userPoa.getNick());
+			System.out.println("Chat de " + this.userPoa.getNick());
 		}
 	}
 
@@ -192,18 +203,18 @@ public class UserIHM {
 		chatPanel.add(chatHistory);
 		chatHistory.setEditable(false);
 		StyledDocument doc = chatHistory.getStyledDocument();
-		
-	    Style style = doc.addStyle("AEcrit", null);
-	    StyleConstants.setItalic(style, true);
-	    StyleConstants.setFontFamily(style, "SansSerif");
-	    StyleConstants.setFontSize(style, 16);
-	    
-	    style = doc.addStyle("Ecrit", null);
-	    StyleConstants.setItalic(style, false);
-	    StyleConstants.setFontFamily(style, "SansSerif");
-	    StyleConstants.setFontSize(style, 14);
+
+		Style style = doc.addStyle("AEcrit", null);
+		StyleConstants.setItalic(style, true);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 16);
+
+		style = doc.addStyle("Ecrit", null);
+		StyleConstants.setItalic(style, false);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 14);
 		userPoa.setChatHistory(chatHistory);
-	    
+
 		JPanel sendPanel = new JPanel();
 		chatPanel.add(sendPanel);
 		sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
@@ -221,7 +232,7 @@ public class UserIHM {
 						server.comment(UserRunnable.id, chatTextBox.getText());
 						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
 						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
-						doc.insertString(doc.getLength(), chatTextBox.getText()+"\n", doc.getStyle("Ecrit"));
+						doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
 						chatTextBox.setText("");
 					} catch (Exception exp) {
 						// TODO: handle exception
@@ -234,17 +245,17 @@ public class UserIHM {
 		sendPanel.add(sendButton);
 		sendButton.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
-				if(!chatTextBox.getText().trim().equalsIgnoreCase("")) {
+				if (!chatTextBox.getText().trim().equalsIgnoreCase("")) {
 					// TODO Auto-generated method stub
 					try {
 						server.comment(UserRunnable.id, chatTextBox.getText());
 						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
 						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
-						doc.insertString(doc.getLength(), chatTextBox.getText()+"\n", doc.getStyle("Ecrit"));
+						doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
 						chatTextBox.setText("");
 					} catch (Exception exp) {
 						// TODO: handle exception
-					}					
+					}
 				}
 			}
 

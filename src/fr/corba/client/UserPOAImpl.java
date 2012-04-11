@@ -13,6 +13,15 @@ import fr.corba.idl.Code.UserPOA;
 public class UserPOAImpl extends UserPOA {
 	private JTextPane chatHistory;
 	private String nick;
+	private char[] mdp;
+
+	public char[] getMdp() {
+		return mdp;
+	}
+
+	public void setMdp(char[] mdp) {
+		this.mdp = mdp;
+	}
 
 	public String getNick() {
 		return nick;
