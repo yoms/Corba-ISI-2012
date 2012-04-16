@@ -6,6 +6,7 @@ module Code {
 	exception NameAlreadyUsed {};
 	exception UnknownID {};
 	exception NotAllowed {};
+	exception WrongPassword {};
 	
 	interface User{
 		void receiveRoom(in Object room);
@@ -21,7 +22,7 @@ module Code {
 	};
 	interface Server
 	{
-		string subscribe(in string nick, in User c)	raises (NameAlreadyUsed);
+		string subscribe(in string nick,in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
 		void unsubscribe(in string myId) raises (UnknownID);
 		void requestMove(in short x, in short y);
 		void changeRoom(in string myId);

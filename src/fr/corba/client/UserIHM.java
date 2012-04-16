@@ -32,6 +32,7 @@ import fr.corba.idl.Code.Server;
 import fr.corba.idl.Code.ServerHelper;
 import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
+import fr.corba.idl.Code.WrongPassword;
 
 public class UserIHM {
 
@@ -83,10 +84,16 @@ public class UserIHM {
 	public boolean subscribe() {
 		userRunnableThread = new Thread(new UserRunnable());
 		try {
-			UserRunnable.id = server.subscribe(this.userPoa.getNick(), user);
+			UserRunnable.id = server.subscribe(this.userPoa.getNick(), this.userPoa.getMdp(), user);
 			userRunnableThread.start();
 		} catch (NameAlreadyUsed e) {
-			JOptionPane.showMessageDialog(null, "Nom déjà existant", "Erreur", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Nom dï¿½jï¿½ existant", "Erreur", JOptionPane.ERROR_MESSAGE);
+			this.userPoa.setNick(null);
+			this.userPoa.setMdp(null);
+			return false;
+		} catch (WrongPassword e) {
+
+			JOptionPane.showMessageDialog(null, "Le mot de passe ne corespond pas", "Erreur", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
 			return false;
@@ -106,7 +113,7 @@ public class UserIHM {
 			mdp = passe.getPassword();
 			if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
 				this.userPoa.setNick(nick);
-				this.userPoa.setMdp(mdp);
+				this.userPoa.setMdp(new String(mdp));
 				if (!this.subscribe()) {
 					nick = "";
 					mdp = new char[0];
@@ -122,7 +129,7 @@ public class UserIHM {
 	 */
 	public UserIHM(String[] args) {
 		initializeORB(args);
-		int retour = JOptionPane.showOptionDialog(null, "Avez-vous déjà un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int retour = JOptionPane.showOptionDialog(null, "Avez-vous dï¿½jï¿½ un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		switch (retour) {
 		// Connexion
 		case 0:

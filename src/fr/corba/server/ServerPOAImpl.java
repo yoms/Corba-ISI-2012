@@ -11,9 +11,12 @@ import fr.corba.idl.Code.NotAllowed;
 import fr.corba.idl.Code.ServerPOA;
 import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
+import fr.corba.idl.Code.WrongPassword;
 
 public class ServerPOAImpl extends ServerPOA {
 
+
+	private DataBase db;
 	protected class Client {
 		public User user;
 		public String nick;
@@ -23,14 +26,21 @@ public class ServerPOAImpl extends ServerPOA {
 			this.nick = nick;
 		}
 	}
+	
+	public ServerPOAImpl() {
+		super();
+		db = new DataBase();
+	}
 
 	// Map<id, Client>
 	protected Map<String, Client> clients = new HashMap<String, Client>();
 	protected List<String> nicks = new Vector<String>();
 
-	public String subscribe(String nick, User c) throws NameAlreadyUsed {
+	public String subscribe(String nick, String password, User c) throws NameAlreadyUsed, WrongPassword {
 		if (nicks.contains(nick))
 			throw new NameAlreadyUsed();
+		if (!db.verifyUser(nick, password))
+			throw new WrongPassword();
 		nicks.add(nick);
 		String id = UUID.randomUUID().toString();
 		System.out.println("subscribe: " + nick + " -> " + id);
