@@ -24,6 +24,7 @@ public class ServerPOAImpl extends ServerPOA {
 		}
 	}
 
+	// Map<id, Client>
 	protected Map<String, Client> clients = new HashMap<String, Client>();
 	protected List<String> nicks = new Vector<String>();
 

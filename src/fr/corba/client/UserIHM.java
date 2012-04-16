@@ -62,7 +62,6 @@ public class UserIHM {
 
 	private void initializeORB(String[] args) {
 		try {
-			// TODO Auto-generated method stub
 			UserRunnable.orb = ORB.init(args, null);
 			// getting NameService
 			org.omg.CORBA.Object obj = UserRunnable.orb.resolve_initial_references("NameService");
@@ -87,7 +86,6 @@ public class UserIHM {
 			UserRunnable.id = server.subscribe(this.userPoa.getNick(), user);
 			userRunnableThread.start();
 		} catch (NameAlreadyUsed e) {
-			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "Nom déjà existant", "Erreur", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
@@ -124,10 +122,27 @@ public class UserIHM {
 	 */
 	public UserIHM(String[] args) {
 		initializeORB(args);
-		this.connectionDialog();
-		if (this.userPoa.getNick() != null && this.userPoa.getMdp() != null) {
-			initialize();
-			System.out.println("Chat de " + this.userPoa.getNick());
+		int retour = JOptionPane.showOptionDialog(null, "Avez-vous déjà un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		switch (retour) {
+		// Connexion
+		case 0:
+			this.connectionDialog();
+			if (this.userPoa.getNick() != null && this.userPoa.getMdp() != null) {
+				initialize();
+				System.out.println("Chat de " + this.userPoa.getNick());
+			}
+			break;
+		// Creation d'un compte
+		case 1:
+			new Formulaire();
+			break;
+		// Annuler
+		case 2:
+			System.exit(0);
+
+			break;
+		default:
+			break;
 		}
 	}
 
