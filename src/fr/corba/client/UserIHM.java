@@ -93,7 +93,7 @@ public class UserIHM {
 			return false;
 		} catch (WrongPassword e) {
 
-			JOptionPane.showMessageDialog(null, "Les informations de connexion ne correspondent pas.", "Erreur d'indentification", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Les informations de connéxion ne correspondent pas.", "Erreur d'indentification", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
 			return false;
