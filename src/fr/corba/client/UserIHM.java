@@ -87,13 +87,13 @@ public class UserIHM {
 			UserRunnable.id = server.subscribe(this.userPoa.getNick(), this.userPoa.getMdp(), user);
 			userRunnableThread.start();
 		} catch (NameAlreadyUsed e) {
-			JOptionPane.showMessageDialog(null, "Nom dï¿½jï¿½ existant", "Erreur", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Cet utilisateur est déjà connecté.", "Erreur de connexion", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
 			return false;
 		} catch (WrongPassword e) {
 
-			JOptionPane.showMessageDialog(null, "Le mot de passe ne corespond pas", "Erreur", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Les informations de connexion ne correspondent pas.", "Erreur d'indentification", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
 			return false;
@@ -129,7 +129,7 @@ public class UserIHM {
 	 */
 	public UserIHM(String[] args) {
 		initializeORB(args);
-		int retour = JOptionPane.showOptionDialog(null, "Avez-vous dï¿½jï¿½ un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		int retour = JOptionPane.showOptionDialog(null, "Avez-vous déjà un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 		switch (retour) {
 		// Connexion
 		case 0:

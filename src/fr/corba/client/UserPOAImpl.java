@@ -65,7 +65,7 @@ public class UserPOAImpl extends UserPOA {
 		if(!this.getNick().equalsIgnoreCase(nick)) {
 			StyledDocument doc = chatHistory.getStyledDocument();
 			try {
-				doc.insertString(doc.getLength(), nick + " a ï¿½crit : \n", doc.getStyle("AEcrit"));
+				doc.insertString(doc.getLength(), nick + " a écrit : \n", doc.getStyle("AEcrit"));
 				doc.insertString(doc.getLength(), text+"\n", doc.getStyle("Ecrit"));
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
