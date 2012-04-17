@@ -10,6 +10,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 
 import javax.swing.BoxLayout;
@@ -18,8 +20,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -166,6 +170,8 @@ public class UserIHM {
 		frame.setBounds(100, 100, 836, 605);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
+		frame.setPreferredSize(new Dimension(800, 500));
+		frame.setMinimumSize(frame.getPreferredSize());
 		frame.addWindowListener(new WindowListener() {
 
 			@Override
@@ -227,19 +233,30 @@ public class UserIHM {
 		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
 
 		JTextPane chatHistory = new JTextPane();
-		chatPanel.add(chatHistory);
 		chatHistory.setEditable(false);
+
+		JScrollPane scrollPane = new JScrollPane(chatHistory);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setPreferredSize(new Dimension(200, 50));
+		chatPanel.add(scrollPane);
+
 		StyledDocument doc = chatHistory.getStyledDocument();
 
 		Style style = doc.addStyle("AEcrit", null);
-		StyleConstants.setItalic(style, true);
+		StyleConstants.setBold(style, true);
 		StyleConstants.setFontFamily(style, "SansSerif");
 		StyleConstants.setFontSize(style, 16);
 
 		style = doc.addStyle("Ecrit", null);
-		StyleConstants.setItalic(style, false);
 		StyleConstants.setFontFamily(style, "SansSerif");
 		StyleConstants.setFontSize(style, 14);
+		userPoa.setChatHistory(chatHistory);
+
+		style = doc.addStyle("Heure", null);
+		StyleConstants.setItalic(style, true);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 10);
 		userPoa.setChatHistory(chatHistory);
 
 		JPanel sendPanel = new JPanel();
@@ -249,21 +266,13 @@ public class UserIHM {
 		chatTextBox = new JTextField();
 		sendPanel.add(chatTextBox);
 		chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
-		chatTextBox.setMaximumSize(new Dimension(1250, 500));
+		chatTextBox.setMaximumSize(new Dimension(800, 500));
 		chatTextBox.setColumns(10);
 		chatTextBox.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				int key = e.getKeyCode();
 				if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
-					try {
-						server.comment(UserRunnable.id, chatTextBox.getText());
-						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
-						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
-						doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
-						chatTextBox.setText("");
-					} catch (Exception exp) {
-						// TODO: handle exception
-					}
+					addPost();
 				}
 			}
 		});
@@ -273,16 +282,7 @@ public class UserIHM {
 		sendButton.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				if (!chatTextBox.getText().trim().equalsIgnoreCase("")) {
-					// TODO Auto-generated method stub
-					try {
-						server.comment(UserRunnable.id, chatTextBox.getText());
-						StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
-						doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
-						doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
-						chatTextBox.setText("");
-					} catch (Exception exp) {
-						// TODO: handle exception
-					}
+					addPost();
 				}
 			}
 
@@ -298,9 +298,28 @@ public class UserIHM {
 			public void mouseReleased(MouseEvent arg0) {
 			}
 		});
+
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		chatTextBox.requestFocusInWindow();
 		chatTextBox.requestFocus();
 	}
 
+	protected void addPost() {
+		try {
+			Calendar calendar = new GregorianCalendar();
+			int hour = calendar.get(Calendar.HOUR_OF_DAY);
+			int minute = calendar.get(Calendar.MINUTE);
+			String time = hour + ":" + minute;
+
+			server.comment(UserRunnable.id, chatTextBox.getText());
+			StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
+			doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
+			doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
+			doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));
+			chatTextBox.setText("");
+		} catch (Exception exp) {
+			exp.printStackTrace();
+		}
+	}
 }
