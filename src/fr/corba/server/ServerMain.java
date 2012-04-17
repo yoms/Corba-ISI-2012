@@ -1,17 +1,25 @@
 package fr.corba.server;
 
-import fr.corba.idl.Code.*;
+import java.util.Properties;
+
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.POAManager;
 
+import fr.corba.idl.Code.Server;
+
 public class ServerMain {
 	public static void main(String args[]) {
 		try {
+			Properties p = new Properties();
+			// UTF-8, UTF-16
+			p.setProperty("com.sun.CORBA.codeset.charsets", "0x05010001, 0x00010109");
+			// UTF-16, UTF-8
+			p.setProperty("com.sun.CORBA.codeset.wcharsets", "0x00010109, 0x05010001");
 			// initializing ORB
-			ORB orb = ORB.init(args, null);
+			ORB orb = ORB.init(args, p);
 
 			// getting reference to POA
 			org.omg.CORBA.Object obj = orb.resolve_initial_references("RootPOA");

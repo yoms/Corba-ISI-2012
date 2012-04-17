@@ -15,8 +15,8 @@ import fr.corba.idl.Code.WrongPassword;
 
 public class ServerPOAImpl extends ServerPOA {
 
-
 	private DataBase db;
+
 	protected class Client {
 		public User user;
 		public String nick;
@@ -26,7 +26,7 @@ public class ServerPOAImpl extends ServerPOA {
 			this.nick = nick;
 		}
 	}
-	
+
 	public ServerPOAImpl() {
 		super();
 		db = new DataBase();

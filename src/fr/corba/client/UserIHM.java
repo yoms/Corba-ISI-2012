@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Properties;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -63,7 +64,12 @@ public class UserIHM {
 
 	private void initializeORB(String[] args) {
 		try {
-			UserRunnable.orb = ORB.init(args, null);
+			Properties p = new Properties();
+			// UTF-8, UTF-16
+			p.setProperty("com.sun.CORBA.codeset.charsets", "0x05010001, 0x00010109");
+			// UTF-16, UTF-8
+			p.setProperty("com.sun.CORBA.codeset.wcharsets", "0x00010109, 0x05010001");
+			UserRunnable.orb = ORB.init(args, p);
 			// getting NameService
 			org.omg.CORBA.Object obj = UserRunnable.orb.resolve_initial_references("NameService");
 			NamingContextExt ncRef = org.omg.CosNaming.NamingContextExtHelper.narrow(obj);
@@ -92,8 +98,7 @@ public class UserIHM {
 			this.userPoa.setMdp(null);
 			return false;
 		} catch (WrongPassword e) {
-
-			JOptionPane.showMessageDialog(null, "Les informations de connéxion ne correspondent pas.", "Erreur d'indentification", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Les informations de connexion ne correspondent pas.", "Erreur d'identification", JOptionPane.ERROR_MESSAGE);
 			this.userPoa.setNick(null);
 			this.userPoa.setMdp(null);
 			return false;

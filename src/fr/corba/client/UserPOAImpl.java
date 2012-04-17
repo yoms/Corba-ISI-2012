@@ -12,6 +12,7 @@ import fr.corba.idl.Code.UserPOA;
 
 public class UserPOAImpl extends UserPOA {
 	private JTextPane chatHistory;
+	private Canvas canvas;
 	private String nick;
 	private String mdp;
 
@@ -39,8 +40,6 @@ public class UserPOAImpl extends UserPOA {
 		this.chatHistory = chatHistory;
 	}
 
-	private Canvas canvas;
-
 	public Canvas getCanvas() {
 		return canvas;
 	}
@@ -58,15 +57,15 @@ public class UserPOAImpl extends UserPOA {
 	@Override
 	public void receiveChatMessage(String nick, String text) {
 		// TODO Auto-generated method stub
-		System.out.println("receiveChatMessage("+nick+", "+text+")");
+		System.out.println("receiveChatMessage(" + nick + ", " + text + ")");
 		if (chatHistory == null)
 			return;
-		
-		if(!this.getNick().equalsIgnoreCase(nick)) {
+
+		if (!this.getNick().equalsIgnoreCase(nick)) {
 			StyledDocument doc = chatHistory.getStyledDocument();
 			try {
 				doc.insertString(doc.getLength(), nick + " a écrit : \n", doc.getStyle("AEcrit"));
-				doc.insertString(doc.getLength(), text+"\n", doc.getStyle("Ecrit"));
+				doc.insertString(doc.getLength(), text + "\n", doc.getStyle("Ecrit"));
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
