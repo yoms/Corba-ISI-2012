@@ -59,7 +59,6 @@ public class Formulaire extends JFrame {
 		this.humain.addTextField("Identifiant");
 		this.avatar.addTextField("Pseudo");
 		this.avatar.addComboBox("Taille", new Object[] { "Nain", "Petit", "Moyen", "Grand", "Géant" });
-		this.avatar.addComboBox("Humeur", new Object[] { "Content", "Hilare", "Triste", "Inquiet", "Effrayé" });
 		this.avatar.addComboBox("Sexe", new Object[] { "Masculin", "Féminin" });
 
 		// Ajout des boutons
@@ -120,7 +119,7 @@ public class Formulaire extends JFrame {
 		p.add(create);
 		p.add(reinit);
 		p.add(cancel);
-		
+
 		// Ajout des composants
 		((JPanel) getContentPane()).add(this.humain);
 		((JPanel) getContentPane()).add(this.avatar);
@@ -136,6 +135,8 @@ public class Formulaire extends JFrame {
 		setResizable(false);
 		// Affiche la fenetre
 		setVisible(true);
+		this.humain.getComponent(1).requestFocusInWindow();
+		this.humain.getComponent(1).requestFocus();
 	}
 
 	public static void main(String[] args) {
