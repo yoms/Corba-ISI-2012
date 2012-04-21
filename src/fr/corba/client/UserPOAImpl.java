@@ -69,11 +69,11 @@ public class UserPOAImpl extends UserPOA {
 				Calendar calendar = new GregorianCalendar();
 				int hour = calendar.get(Calendar.HOUR_OF_DAY);
 				int minute = calendar.get(Calendar.MINUTE);
-				String time = hour +":"+minute;
-				
+				String time = hour + ":" + minute;
+
 				doc.insertString(doc.getLength(), nick + " a écrit : \n", doc.getStyle("AEcrit"));
 				doc.insertString(doc.getLength(), text + "\n", doc.getStyle("Ecrit"));
-				doc.insertString(doc.getLength(), time+"\n\n", doc.getStyle("Heure"));
+				doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));
 			} catch (BadLocationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

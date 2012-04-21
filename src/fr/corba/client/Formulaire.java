@@ -49,16 +49,26 @@ public class Formulaire extends JFrame {
 		}
 	}
 
+	private static Formulaire instance;
+
 	private Panel humain;
 	private Panel avatar;
 	private ArrayList<String> attributs;
 	private Server server;
 
+	public static Formulaire getInstance(Server server) {
+		if (instance == null)
+			instance = new Formulaire(server);
+
+		instance.setFocusable(true);
+		return instance;
+	}
+
 	public ArrayList<String> getAttributs() {
 		return attributs;
 	}
 
-	public Formulaire(Server s) {
+	private Formulaire(Server s) {
 		super("Création de compte");
 
 		this.server = s;
@@ -115,7 +125,7 @@ public class Formulaire extends JFrame {
 					return;
 				}
 				JOptionPane.showMessageDialog(getContentPane(), "Voici vos identifiants de connexion :\nIdentifiant : " + attributs.get(0) + "\nCode d'accès : " + mdp, "Votre compte a été créé", JOptionPane.INFORMATION_MESSAGE);
-				
+				dispose();
 			}
 		});
 		JButton reinit = new JButton("Réinitialiser");
@@ -138,7 +148,8 @@ public class Formulaire extends JFrame {
 		JButton cancel = new JButton("Annuler");
 		cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+				setVisible(false);
+				dispose();
 			}
 		});
 		p.add(create);

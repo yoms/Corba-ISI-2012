@@ -1,34 +1,15 @@
 package fr.corba.client;
 
-import java.awt.Canvas;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.GridLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Properties;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
@@ -42,13 +23,13 @@ import fr.corba.idl.Code.WrongPassword;
 
 public class UserIHM {
 
-	private JFrame frame;
-	private JTextField chatTextBox;
 	private Thread userRunnableThread;
 	private Server server;
 	private User user;
 	private UserPOAImpl userPoa;
-	private Canvas canvas;
+
+	private Chat chat;
+	private Formulaire formulaire;
 
 	/**
 	 * Launch the application.
@@ -57,9 +38,7 @@ public class UserIHM {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UserIHM window = new UserIHM(args);
-					if (window.frame != null)
-						window.frame.setVisible(true);
+					new UserIHM(args);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -92,6 +71,125 @@ public class UserIHM {
 		}
 	}
 
+	public void connectionDialog() {
+		if (this.chat == null) {
+			String nick = "";
+			char[] mdp = null;
+			int cancel = 0;
+			JTextField utilisateur = new JTextField();
+			JPasswordField passe = new JPasswordField();
+			while (cancel != -1 && cancel != 2 && (nick == null || nick.equalsIgnoreCase("") || mdp == null || mdp.toString().equalsIgnoreCase(""))) {
+				cancel = JOptionPane.showOptionDialog(null, new Object[] { "Identifiant :", utilisateur, "Mot de passe :", passe }, "Connexion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				nick = utilisateur.getText();
+				mdp = passe.getPassword();
+				if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
+					this.userPoa.setNick(nick);
+					this.userPoa.setMdp(new String(mdp));
+					if (!this.subscribe()) {
+						nick = "";
+						mdp = new char[0];
+					}
+				}
+			}
+		} else {
+			this.chat.setLocationRelativeTo(null);
+			this.chat.setVisible(true);
+		}
+	}
+
+	/**
+	 * Create the application.
+	 * 
+	 * @param args
+	 */
+	public UserIHM(String[] args) {
+		initializeORB(args);
+
+		Bienvenue bienvenue = new Bienvenue();
+
+		bienvenue.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				if (chat != null) {
+					try {
+						server.unsubscribe(UserRunnable.id);
+					} catch (UnknownID e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				System.exit(0);
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		bienvenue.getCreate().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				formulaire = Formulaire.getInstance(server);
+				formulaire.setLocationRelativeTo(null);
+				formulaire.setVisible(true);
+			}
+		});
+		bienvenue.getConnect().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				connectionDialog();
+				if (userPoa.getNick() != null && userPoa.getMdp() != null) {
+					chat = Chat.getInstance(userPoa, server);
+					chat.setLocationRelativeTo(null);
+					chat.setVisible(true);
+				}
+			}
+		});
+		bienvenue.getQuit().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (chat != null) {
+					try {
+						server.unsubscribe(UserRunnable.id);
+					} catch (UnknownID e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				System.exit(0);
+			}
+		});
+	}
+
 	public boolean subscribe() {
 		userRunnableThread = new Thread(new UserRunnable());
 		try {
@@ -109,218 +207,5 @@ public class UserIHM {
 			return false;
 		}
 		return true;
-	}
-
-	public void connectionDialog() {
-		String nick = "";
-		char[] mdp = null;
-		int cancel = 0;
-		JTextField utilisateur = new JTextField();
-		JPasswordField passe = new JPasswordField();
-		while (cancel != -1 && cancel != 2 && (nick == null || nick.equalsIgnoreCase("") || mdp == null || mdp.toString().equalsIgnoreCase(""))) {
-			cancel = JOptionPane.showOptionDialog(null, new Object[] { "Identifiant :", utilisateur, "Mot de passe :", passe }, "Connexion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-			nick = utilisateur.getText();
-			mdp = passe.getPassword();
-			if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
-				this.userPoa.setNick(nick);
-				this.userPoa.setMdp(new String(mdp));
-				if (!this.subscribe()) {
-					nick = "";
-					mdp = new char[0];
-				}
-			}
-		}
-	}
-
-	/**
-	 * Create the application.
-	 * 
-	 * @param args
-	 */
-	public UserIHM(String[] args) {
-		initializeORB(args);
-		int retour = JOptionPane.showOptionDialog(null, "Avez-vous déjà un compte ?", "Bienvenue", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-		switch (retour) {
-		// Connexion
-		case 0:
-			this.connectionDialog();
-			if (this.userPoa.getNick() != null && this.userPoa.getMdp() != null) {
-				initialize();
-				System.out.println("Chat de " + this.userPoa.getNick());
-			}
-			break;
-		// Creation d'un compte
-		case 1:
-			new Formulaire(this.server);
-			break;
-		// Annuler
-		case 2:
-			System.exit(0);
-
-			break;
-		default:
-			break;
-		}
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame(this.userPoa.getNick());
-		frame.setBounds(100, 100, 836, 605);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new GridLayout(0, 2, 0, 0));
-		frame.setPreferredSize(new Dimension(800, 500));
-		frame.setMinimumSize(frame.getPreferredSize());
-		frame.addWindowListener(new WindowListener() {
-
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void windowIconified(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void windowDeiconified(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				try {
-					server.unsubscribe(UserRunnable.id);
-				} catch (UnknownID e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-			@Override
-			public void windowClosed(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void windowActivated(WindowEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		JPanel worldPanel = new JPanel();
-		frame.getContentPane().add(worldPanel);
-
-		canvas = new Canvas();
-		worldPanel.add(canvas);
-
-		JPanel chatPanel = new JPanel();
-		frame.getContentPane().add(chatPanel);
-		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-
-		JTextPane chatHistory = new JTextPane();
-		chatHistory.setEditable(false);
-
-		JScrollPane scrollPane = new JScrollPane(chatHistory);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setPreferredSize(new Dimension(200, 50));
-		chatPanel.add(scrollPane);
-
-		StyledDocument doc = chatHistory.getStyledDocument();
-
-		Style style = doc.addStyle("AEcrit", null);
-		StyleConstants.setBold(style, true);
-		StyleConstants.setFontFamily(style, "SansSerif");
-		StyleConstants.setFontSize(style, 16);
-
-		style = doc.addStyle("Ecrit", null);
-		StyleConstants.setFontFamily(style, "SansSerif");
-		StyleConstants.setFontSize(style, 14);
-		userPoa.setChatHistory(chatHistory);
-
-		style = doc.addStyle("Heure", null);
-		StyleConstants.setItalic(style, true);
-		StyleConstants.setFontFamily(style, "SansSerif");
-		StyleConstants.setFontSize(style, 10);
-		userPoa.setChatHistory(chatHistory);
-
-		JPanel sendPanel = new JPanel();
-		chatPanel.add(sendPanel);
-		sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
-
-		chatTextBox = new JTextField();
-		sendPanel.add(chatTextBox);
-		chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
-		chatTextBox.setMaximumSize(new Dimension(800, 500));
-		chatTextBox.setColumns(10);
-		chatTextBox.addKeyListener(new KeyAdapter() {
-			public void keyPressed(KeyEvent e) {
-				int key = e.getKeyCode();
-				if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
-					addPost();
-				}
-			}
-		});
-
-		JButton sendButton = new JButton("Send");
-		sendPanel.add(sendButton);
-		sendButton.addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) {
-				if (!chatTextBox.getText().trim().equalsIgnoreCase("")) {
-					addPost();
-				}
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
-
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-		chatTextBox.requestFocusInWindow();
-		chatTextBox.requestFocus();
-	}
-
-	protected void addPost() {
-		try {
-			Calendar calendar = new GregorianCalendar();
-			int hour = calendar.get(Calendar.HOUR_OF_DAY);
-			int minute = calendar.get(Calendar.MINUTE);
-			String time = hour + ":" + minute;
-
-			server.comment(UserRunnable.id, chatTextBox.getText());
-			StyledDocument doc = userPoa.getChatHistory().getStyledDocument();
-			doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
-			doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
-			doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));
-			chatTextBox.setText("");
-		} catch (Exception exp) {
-			exp.printStackTrace();
-		}
 	}
 }
