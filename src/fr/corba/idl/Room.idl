@@ -3,6 +3,7 @@ module corba {
 module idl {
 module Code {
 
+	exception IdAlreadyUsed {};
 	exception NameAlreadyUsed {};
 	exception UnknownID {};
 	exception NotAllowed {};
@@ -22,6 +23,7 @@ module Code {
 	};
 	interface Server
 	{
+		string addUser(in string identifiant, in string pseudo, in string taille, in string humeur) raises (NameAlreadyUsed, IdAlreadyUsed);
 		string subscribe(in string nick,in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
 		void unsubscribe(in string myId) raises (UnknownID);
 		void requestMove(in short x, in short y);

@@ -1,41 +1,38 @@
-CREATE  TABLE IF NOT EXISTS `Avatar` (
+create table if not exists avatar (
+  id integer primary key,
 
-  `idAvatar` INT NOT NULL ,
+  identifiant varchar(45) not null unique,
 
-  `code_acces` VARCHAR(45) NULL ,
+  code_acces varchar(45) not null ,
 
-  `taille` VARCHAR(45) NULL ,
+  pseudo varchar(45) not null unique,
 
-  `humeur` VARCHAR(45) NULL ,
+  taille varchar(45) not null ,
 
-  `nom` VARCHAR(45) NULL ,
+  humeur varchar(45) not null ,
 
-  `pièce_courante` VARCHAR(45) NULL ,
+  piece_courante varchar(45) null ,
 
-  `est_admin` TINYINT(1) NULL DEFAULT false ,
+  est_admin tinyint(1) null default false ,
 
-  `est_connecte` TINYINT(1) NULL DEFAULT false ,
-
-  PRIMARY KEY (`idAvatar`) );
+  est_connecte tinyint(1) null default false
+   );
   
-CREATE  TABLE IF NOT EXISTS `Post` (
+create table if not exists post (
+  id integer primary key,
 
-  `idPost` INT NOT NULL ,
+  contenu varchar(45) null ,
 
-  `contenu` VARCHAR(45) NULL ,
+  date_heure datetime null ,
 
-  `date_heure` DATETIME NULL ,
+  id_piece varchar(45) null ,
 
-  `id_piece` VARCHAR(45) NULL ,
+  id_posteur int null ,
 
-  `id_posteur` INT NULL ,
+  constraint fk_id_poster
 
-  PRIMARY KEY (`idPost`) ,
+    foreign key (id_posteur )
 
-  CONSTRAINT `fk_id_poster`
-
-    FOREIGN KEY (`id_posteur` )
-
-    REFERENCES `Avatar` (`idAvatar` ));
+    references avatar (id ));
     
     

@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Calendar;
@@ -150,7 +151,7 @@ public class UserIHM {
 			break;
 		// Creation d'un compte
 		case 1:
-			new Formulaire();
+			new Formulaire(this.server);
 			break;
 		// Annuler
 		case 2:

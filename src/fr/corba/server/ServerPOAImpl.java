@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
+import fr.corba.idl.Code.IdAlreadyUsed;
 import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.NotAllowed;
 import fr.corba.idl.Code.ServerPOA;
@@ -100,5 +101,18 @@ public class ServerPOAImpl extends ServerPOA {
 	public void requestConnectedUsers(String myId) throws NotAllowed {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public String addUser(String identifiant, String pseudo, String taille, String humeur) throws NameAlreadyUsed, IdAlreadyUsed {
+		System.out.println(identifiant + "," + pseudo + "," + taille + "," + humeur);
+		if (db.existsOnAvatar("identifiant", identifiant))
+			throw new IdAlreadyUsed();
+		if (db.existsOnAvatar("pseudo", pseudo))
+			throw new NameAlreadyUsed();
+		String[] values = { identifiant, pseudo, taille, humeur };
+		String code_acces = db.addUser(values);
+		System.out.println("addUser: " + identifiant + " (" + pseudo + "," + code_acces + ")");
+		return code_acces;
 	}
 }
