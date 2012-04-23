@@ -1,6 +1,7 @@
 package fr.corba.server;
 
 import java.io.FileInputStream;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -25,7 +26,8 @@ public class DataBase {
 		try {
 			int ch;
 			StringBuffer strContent = new StringBuffer();
-			FileInputStream fin = new FileInputStream("C:\\Users\\alex\\Workspace\\Corba-ISI-2012\\src\\ressource\\schema.sql");
+			URI uri = DataBase.class.getResource("../../../ressource/schema.sql").toURI();
+			FileInputStream fin = new FileInputStream(uri.getPath());
 
 			while ((ch = fin.read()) != -1)
 				strContent.append((char) ch);
