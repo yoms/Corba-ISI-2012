@@ -39,24 +39,26 @@ public class DataBase {
 			ResultSet rs = verifstat.executeQuery("select * from Avatar where identifiant = 'yoms';");
 			if (!rs.next()) {
 				System.out.println("Save base users ");
-				PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, '', ?, ?);");
+				PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, ?, '', ?, ?);");
 
 				prep.setString(1, "yoms");
 				prep.setString(2, "superyoms");
 				prep.setString(3, "yoms");
-				prep.setString(4, "geant");
-				prep.setString(5, "nouveau");
-				prep.setInt(6, 1);
-				prep.setInt(7, 0);
+				prep.setString(4, "Geant");
+				prep.setString(5, "Nouveau");
+				prep.setString(6, "Masculin");
+				prep.setInt(7, 1);
+				prep.setInt(8, 0);
 				prep.addBatch();
 
 				prep.setString(1, "alex");
 				prep.setString(2, "superalex");
 				prep.setString(3, "alex");
-				prep.setString(4, "grand");
-				prep.setString(5, "nouveau");
-				prep.setInt(6, 1);
-				prep.setInt(7, 0);
+				prep.setString(4, "Grand");
+				prep.setString(5, "Nouveau");
+				prep.setString(6, "Masculin");
+				prep.setInt(7, 1);
+				prep.setInt(8, 0);
 				prep.addBatch();
 
 				conn.setAutoCommit(false);
@@ -88,7 +90,7 @@ public class DataBase {
 	public String addUser(String[] values) {
 		String code_acces = this.generateCodeAcces();
 		try {
-			PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, '', ?, ?);");
+			PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, ?, '', ?, ?);");
 
 			// identifiant
 			prep.setString(1, values[0]);
@@ -99,7 +101,11 @@ public class DataBase {
 			// taille
 			prep.setString(4, values[2]);
 			// humeur
-			prep.setString(5, values[3]);
+			prep.setString(5, "nouveau");
+			// sexe
+			prep.setString(6, values[3]);
+			prep.setInt(7, 1);
+			prep.setInt(8, 0);
 			// est_admin
 			prep.setInt(6, 0);
 			// est_connecte

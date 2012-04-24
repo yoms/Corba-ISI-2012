@@ -11,6 +11,8 @@ create table if not exists avatar (
 
   humeur varchar(45) not null ,
 
+  sexe varchar(45) not null ,
+
   piece_courante varchar(45) null ,
 
   est_admin tinyint(1) null default false ,
