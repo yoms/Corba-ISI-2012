@@ -30,6 +30,7 @@ public class UserIHM {
 
 	private Chat chat;
 	private Formulaire formulaire;
+	private Bienvenue bienvenue;
 
 	/**
 	 * Launch the application.
@@ -105,8 +106,7 @@ public class UserIHM {
 	public UserIHM(String[] args) {
 		initializeORB(args);
 
-		Bienvenue bienvenue = new Bienvenue();
-
+		bienvenue = new Bienvenue();
 		bienvenue.addWindowListener(new WindowListener() {
 
 			@Override
@@ -172,6 +172,7 @@ public class UserIHM {
 					chat = Chat.getInstance(userPoa, server);
 					chat.setLocationRelativeTo(null);
 					chat.setVisible(true);
+					bienvenue.setVisible(false);
 				}
 			}
 		});

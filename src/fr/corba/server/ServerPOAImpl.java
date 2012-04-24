@@ -115,4 +115,10 @@ public class ServerPOAImpl extends ServerPOA {
 		System.out.println("addUser: " + identifiant + " (" + pseudo + "," + code_acces + ")");
 		return code_acces;
 	}
+
+	@Override
+	public boolean isAdmin(String nick, String password) {
+		// TODO Auto-generated method stub
+		return db.isAdmin(nick, password);
+	}
 }

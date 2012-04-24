@@ -25,6 +25,7 @@ module Code {
 	{
 		string addUser(in string identifiant, in string pseudo, in string taille, in string humeur) raises (NameAlreadyUsed, IdAlreadyUsed);
 		string subscribe(in string nick,in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
+		boolean isAdmin(in string nick,in string password);
 		void unsubscribe(in string myId) raises (UnknownID);
 		void requestMove(in short x, in short y);
 		void changeRoom(in string myId);

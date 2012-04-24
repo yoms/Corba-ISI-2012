@@ -80,7 +80,6 @@ public class DataBase {
 			stat.close();
 			return ret;
 		} catch (Exception e) {
-			System.out.println();
 			e.printStackTrace();
 		}
 		return false;
@@ -138,6 +137,19 @@ public class DataBase {
 			return ret;
 		} catch (Exception e) {
 			System.out.println();
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean isAdmin(String nick, String password) {
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select rowid from Avatar where identifiant = '" + nick + "' and code_acces = '" + password + "' and est_admin = 1;");
+			boolean ret = rs.next();
+			stat.close();
+			return ret;
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
