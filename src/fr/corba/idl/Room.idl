@@ -6,12 +6,27 @@ module Code {
 	exception IdAlreadyUsed {};
 	exception NameAlreadyUsed {};
 	exception UnknownID {};
-	exception NotAllowed {};
 	exception WrongPassword {};
 	
+	struct Avatar {
+		long id;
+		string pseudo;
+		string code_acces;
+		string taille;
+		string humeur;
+		string sexe;
+		string piece_courante;
+		boolean est_admin;
+		boolean est_connecte;
+	};
+	
+	typedef sequence<Avatar> Avatars;
+	
 	interface User{
-		void receiveRoom(in Object room);
 		void receiveChatMessage(in string nick, in string text);
+		void receiveKicked();
+		
+		void receiveRoom(in Object room);
 		void receiveMoved(in string nick, in short x, in short y);
 	};
 	
@@ -23,18 +38,17 @@ module Code {
 	};
 	interface Server
 	{
-		string addUser(in string identifiant, in string pseudo, in string taille, in string humeur) raises (NameAlreadyUsed, IdAlreadyUsed);
-		string subscribe(in string nick,in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
-		boolean isAdmin(in string nick,in string password);
+		string subscribe(in string nick, in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
 		void unsubscribe(in string myId) raises (UnknownID);
-		void requestMove(in short x, in short y);
-		void changeRoom(in string myId);
 		void comment(in string myId, in string text) raises (UnknownID);
+		string addUser(in string nick, in string taille, in string humeur) raises (NameAlreadyUsed);
+		boolean isAdmin(in string nick, in string password);
+		Avatars requestExistingAvatars();		
+		void requestKick(in string nick) raises(UnknownID);
 		
-		void requestExistingAvatars(in string myId) raises (NotAllowed);
-		void requestKick(in string myId, in string kickedNick) raises (NotAllowed);
-		void requestRoomContent(in string myId, in string roomName) raises (NotAllowed);
-		void requestConnectedUsers(in string myId) raises (NotAllowed);
+		void requestMove(in short x, in short y);
+		void changeRoom(in string myId);		
+		void requestRoomContent(in string roomName);
 	};
 
 };

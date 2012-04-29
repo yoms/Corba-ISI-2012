@@ -45,7 +45,7 @@ public class ServerMain {
 			orb.run();
 
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
+			e.printStackTrace();
 		}
 	}
 }

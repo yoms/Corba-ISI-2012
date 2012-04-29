@@ -1,11 +1,9 @@
 create table if not exists avatar (
   id integer primary key,
 
-  identifiant varchar(45) not null unique,
+  pseudo varchar(45) not null unique,
 
   code_acces varchar(45) not null ,
-
-  pseudo varchar(45) not null unique,
 
   taille varchar(45) not null ,
 
@@ -26,8 +24,6 @@ create table if not exists post (
   contenu varchar(45) null ,
 
   date_heure datetime null ,
-
-  id_piece varchar(45) null ,
 
   id_posteur int null ,
 

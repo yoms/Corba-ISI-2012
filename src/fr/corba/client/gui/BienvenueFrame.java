@@ -1,4 +1,4 @@
-package fr.corba.client;
+package fr.corba.client.gui;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-public class Bienvenue extends JFrame {
+public class BienvenueFrame extends JFrame {
 
 	private JButton create;
 	private JButton connect;
@@ -27,7 +27,7 @@ public class Bienvenue extends JFrame {
 		return quit;
 	}
 
-	public Bienvenue() {
+	public BienvenueFrame() {
 		super("Bienvenue");
 
 		// Ajout d'un conteneur pour mettre un label par ligne

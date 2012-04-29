@@ -1,4 +1,4 @@
-package fr.corba.client;
+package fr.corba.client.gui;
 
 import java.awt.Canvas;
 import java.awt.Dimension;
@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
@@ -25,30 +26,29 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import fr.corba.idl.Code.Server;
+import fr.corba.client.UserIHM;
+import fr.corba.client.UserRunnable;
 import fr.corba.idl.Code.UnknownID;
-import javax.swing.JTabbedPane;
 
-public class Chat extends JFrame {
-	private static Chat instance;
+public class ChatFrame extends JFrame {
+	private static ChatFrame instance;
 	private Canvas canvas;
 	private JTextField chatTextBox;
-	private UserPOAImpl userPoa;
-	private Server server;
 
-	public static Chat getInstance(UserPOAImpl userPoa, Server server) {
+	private UserIHM userIHM;
+
+	public static ChatFrame getInstance(UserIHM u) {
 		if (instance == null)
-			instance = new Chat(userPoa, server);
+			instance = new ChatFrame(u);
 
 		instance.setFocusable(true);
 		return instance;
 	}
 
-	private Chat(UserPOAImpl u, Server s) {
-		super(u.getNick());
+	private ChatFrame(UserIHM u) {
+		super(u.getUserPoa().getAvatar().pseudo);
 
-		this.userPoa = u;
-		this.server = s;
+		this.userIHM = u;
 		this.setBounds(100, 100, 836, 605);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setPreferredSize(new Dimension(800, 500));
@@ -83,7 +83,7 @@ public class Chat extends JFrame {
 			public void windowClosing(WindowEvent arg0) {
 				// TODO Auto-generated method stub
 				try {
-					server.unsubscribe(UserRunnable.id);
+					userIHM.getServer().unsubscribe(UserRunnable.id);
 				} catch (UnknownID e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -102,75 +102,73 @@ public class Chat extends JFrame {
 
 			}
 		});
-		
-																				
-	JPanel panel = new JPanel();
-	panel.setLayout(new GridLayout(0, 2, 0, 0));
-	if(server.isAdmin(userPoa.getNick(), userPoa.getMdp()))
-	{
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		getContentPane().add(tabbedPane);
-		tabbedPane.addTab("Jeu", null, panel, null);
-		tabbedPane.addTab("Monde virtuel", null, new VirtualWorld(), null);
-		tabbedPane.addTab("Avatars", null, new AvatarsPanel(), null);
-	}
-	else
-	{
-		getContentPane().add(panel);
-	}
-	
-	JPanel worldPanel = new JPanel();
-	panel.add(worldPanel);
-	
-	canvas = new Canvas();
-	worldPanel.add(canvas);
-	
-	JPanel chatPanel = new JPanel();
-	panel.add(chatPanel);
-	chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
-	
-	JTextPane chatHistory = new JTextPane();
-	chatHistory.setEditable(false);
-							
-	JScrollPane scrollPane = new JScrollPane(chatHistory);
-	scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-	scrollPane.setPreferredSize(new Dimension(200, 50));
-	chatPanel.add(scrollPane);
-									
-	StyledDocument doc = chatHistory.getStyledDocument();
-	Style style = doc.addStyle("AEcrit", null);
-	StyleConstants.setBold(style, true);
-	StyleConstants.setFontFamily(style, "SansSerif");
-	StyleConstants.setFontSize(style, 16);
 
-	style = doc.addStyle("Ecrit", null);
-	StyleConstants.setFontFamily(style, "SansSerif");
-	StyleConstants.setFontSize(style, 14);
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(0, 2, 0, 0));
+		if (userIHM.getServer().isAdmin(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().code_acces)) {
+			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+			getContentPane().add(tabbedPane);
+			tabbedPane.addTab("Jeu", null, panel, null);
+			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldPanel(userIHM), null);
+			tabbedPane.addTab("Avatars", null, new AvatarsPanel(userIHM), null);
+		} else {
+			getContentPane().add(panel);
+		}
 
-	style = doc.addStyle("Heure", null);
-	StyleConstants.setItalic(style, true);
-	StyleConstants.setFontFamily(style, "SansSerif");
-	StyleConstants.setFontSize(style, 10);
-	
-	this.userPoa.setChatHistory(chatHistory);
-	this.userPoa.setChatHistory(chatHistory);
-	
-	JPanel sendPanel = new JPanel();
-	chatPanel.add(sendPanel);
-	sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
-			
-	chatTextBox = new JTextField();
-	sendPanel.add(chatTextBox);
-	chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
-	chatTextBox.setMaximumSize(new Dimension(800, 500));
-	chatTextBox.setColumns(10);
-	chatTextBox.addKeyListener(new KeyAdapter() {
-		public void keyPressed(KeyEvent e) {
-			int key = e.getKeyCode();
-			if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
-			addPost();
-		}}});
+		JPanel worldPanel = new JPanel();
+		panel.add(worldPanel);
+
+		canvas = new Canvas();
+		worldPanel.add(canvas);
+
+		JPanel chatPanel = new JPanel();
+		panel.add(chatPanel);
+		chatPanel.setLayout(new BoxLayout(chatPanel, BoxLayout.Y_AXIS));
+
+		JTextPane chatHistory = new JTextPane();
+		chatHistory.setEditable(false);
+
+		JScrollPane scrollPane = new JScrollPane(chatHistory);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setPreferredSize(new Dimension(200, 50));
+		chatPanel.add(scrollPane);
+
+		StyledDocument doc = chatHistory.getStyledDocument();
+		Style style = doc.addStyle("AEcrit", null);
+		StyleConstants.setBold(style, true);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 16);
+
+		style = doc.addStyle("Ecrit", null);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 14);
+
+		style = doc.addStyle("Heure", null);
+		StyleConstants.setItalic(style, true);
+		StyleConstants.setFontFamily(style, "SansSerif");
+		StyleConstants.setFontSize(style, 10);
+
+		userIHM.getUserPoa().setChatHistory(chatHistory);
+		userIHM.getUserPoa().setChatHistory(chatHistory);
+
+		JPanel sendPanel = new JPanel();
+		chatPanel.add(sendPanel);
+		sendPanel.setLayout(new BoxLayout(sendPanel, BoxLayout.X_AXIS));
+
+		chatTextBox = new JTextField();
+		sendPanel.add(chatTextBox);
+		chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
+		chatTextBox.setMaximumSize(new Dimension(800, 500));
+		chatTextBox.setColumns(10);
+		chatTextBox.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				int key = e.getKeyCode();
+				if (key == KeyEvent.VK_ENTER && !chatTextBox.getText().trim().equalsIgnoreCase("")) {
+					addPost();
+				}
+			}
+		});
 
 		JButton sendButton = new JButton("Envoyer");
 		sendPanel.add(sendButton);
@@ -207,8 +205,8 @@ public class Chat extends JFrame {
 			int minute = calendar.get(Calendar.MINUTE);
 			String time = hour + ":" + minute;
 
-			this.server.comment(UserRunnable.id, chatTextBox.getText());
-			StyledDocument doc = this.userPoa.getChatHistory().getStyledDocument();
+			userIHM.getServer().comment(UserRunnable.id, chatTextBox.getText());
+			StyledDocument doc = userIHM.getUserPoa().getChatHistory().getStyledDocument();
 			doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
 			doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
 			doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));

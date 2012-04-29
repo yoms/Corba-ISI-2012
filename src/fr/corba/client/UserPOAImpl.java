@@ -10,28 +10,23 @@ import javax.swing.text.StyledDocument;
 
 import org.omg.CORBA.Object;
 
+import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.UserPOA;
 
 public class UserPOAImpl extends UserPOA {
 	private JTextPane chatHistory;
 	private Canvas canvas;
-	private String nick;
-	private String mdp;
+	private Avatar avatar;
+	private UserIHM userIHM;
 
-	public String getMdp() {
-		return mdp;
+	public UserPOAImpl(UserIHM userIHM) {
+		super();
+		this.userIHM = userIHM;
+		this.avatar = new Avatar();
 	}
 
-	public void setMdp(String mdp) {
-		this.mdp = mdp;
-	}
-
-	public String getNick() {
-		return nick;
-	}
-
-	public void setNick(String nick) {
-		this.nick = nick;
+	public Avatar getAvatar() {
+		return avatar;
 	}
 
 	public JTextPane getChatHistory() {
@@ -51,19 +46,13 @@ public class UserPOAImpl extends UserPOA {
 	}
 
 	@Override
-	public void receiveRoom(Object room) {
+	public void receiveChatMessage(String pseudo, String text) {
 		// TODO Auto-generated method stub
-		System.out.println("receiveRoom(Object room)");
-	}
-
-	@Override
-	public void receiveChatMessage(String nick, String text) {
-		// TODO Auto-generated method stub
-		System.out.println("receiveChatMessage(" + nick + ", " + text + ")");
+		System.out.println("receiveChatMessage(" + pseudo + ", " + text + ")");
 		if (chatHistory == null)
 			return;
 
-		if (!this.getNick().equalsIgnoreCase(nick)) {
+		if (!this.getAvatar().pseudo.equalsIgnoreCase(pseudo)) {
 			StyledDocument doc = chatHistory.getStyledDocument();
 			try {
 				Calendar calendar = new GregorianCalendar();
@@ -71,7 +60,7 @@ public class UserPOAImpl extends UserPOA {
 				int minute = calendar.get(Calendar.MINUTE);
 				String time = hour + ":" + minute;
 
-				doc.insertString(doc.getLength(), nick + " a écrit : \n", doc.getStyle("AEcrit"));
+				doc.insertString(doc.getLength(), pseudo + " a écrit : \n", doc.getStyle("AEcrit"));
 				doc.insertString(doc.getLength(), text + "\n", doc.getStyle("Ecrit"));
 				doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));
 			} catch (BadLocationException e) {
@@ -79,6 +68,24 @@ public class UserPOAImpl extends UserPOA {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void receiveKicked() {
+		try {
+			System.out.println("receiveKicked");
+			this.userIHM.kickedDialog();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void receiveRoom(Object room) {
+		// TODO Auto-generated method stub
+		System.out.println("receiveRoom(Object room)");
 	}
 
 	@Override

@@ -6,9 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
-import fr.corba.idl.Code.IdAlreadyUsed;
+import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.NameAlreadyUsed;
-import fr.corba.idl.Code.NotAllowed;
 import fr.corba.idl.Code.ServerPOA;
 import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
@@ -68,6 +67,46 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	@Override
+	public String addUser(String nick, String taille, String humeur) throws NameAlreadyUsed {
+		System.out.println(nick + "," + taille + "," + humeur);
+		if (db.existsInAvatar("pseudo", nick.toLowerCase()))
+			throw new NameAlreadyUsed();
+		String[] values = { nick, taille, humeur };
+		String code_acces = db.addUser(values);
+		System.out.println("addUser: (" + nick + "," + code_acces + ")");
+		return code_acces;
+	}
+
+	@Override
+	public boolean isAdmin(String nick, String password) {
+		return db.isAdmin(nick, password);
+	}
+
+	@Override
+	public Avatar[] requestExistingAvatars() {
+		return db.selectAllAvatars();
+	}
+
+	@Override
+	public void requestKick(String nick) throws UnknownID {
+		try {
+			Client kicked = null;
+			for (Client client : clients.values()) {
+				if (client.nick.equalsIgnoreCase(nick)) {
+					kicked = client;
+				}
+			}
+			if (kicked == null)
+				throw new UnknownID();
+			System.out.println("requestKick: " + nick);
+			kicked.user.receiveKicked();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void requestMove(short x, short y) {
 		// TODO Auto-generated method stub
 
@@ -80,45 +119,9 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	@Override
-	public void requestExistingAvatars(String myId) throws NotAllowed {
+	public void requestRoomContent(String roomName) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	public void requestKick(String myId, String kickedNick) throws NotAllowed {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void requestRoomContent(String myId, String roomName) throws NotAllowed {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void requestConnectedUsers(String myId) throws NotAllowed {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String addUser(String identifiant, String pseudo, String taille, String humeur) throws NameAlreadyUsed, IdAlreadyUsed {
-		System.out.println(identifiant + "," + pseudo + "," + taille + "," + humeur);
-		if (db.existsOnAvatar("identifiant", identifiant))
-			throw new IdAlreadyUsed();
-		if (db.existsOnAvatar("pseudo", pseudo))
-			throw new NameAlreadyUsed();
-		String[] values = { identifiant, pseudo, taille, humeur };
-		String code_acces = db.addUser(values);
-		System.out.println("addUser: " + identifiant + " (" + pseudo + "," + code_acces + ")");
-		return code_acces;
-	}
-
-	@Override
-	public boolean isAdmin(String nick, String password) {
-		// TODO Auto-generated method stub
-		return db.isAdmin(nick, password);
-	}
 }

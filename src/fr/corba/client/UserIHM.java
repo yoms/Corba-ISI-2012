@@ -14,6 +14,9 @@ import javax.swing.JTextField;
 import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 
+import fr.corba.client.gui.BienvenueFrame;
+import fr.corba.client.gui.ChatFrame;
+import fr.corba.client.gui.FormulaireFrame;
 import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.Server;
 import fr.corba.idl.Code.ServerHelper;
@@ -28,85 +31,15 @@ public class UserIHM {
 	private User user;
 	private UserPOAImpl userPoa;
 
-	private Chat chat;
-	private Formulaire formulaire;
-	private Bienvenue bienvenue;
+	private ChatFrame chat;
+	private FormulaireFrame formulaire;
+	private BienvenueFrame bienvenue;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(final String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					new UserIHM(args);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	private void initializeORB(String[] args) {
-		try {
-			Properties p = new Properties();
-			// UTF-8, UTF-16
-			p.setProperty("com.sun.CORBA.codeset.charsets", "0x05010001, 0x00010109");
-			// UTF-16, UTF-8
-			p.setProperty("com.sun.CORBA.codeset.wcharsets", "0x00010109, 0x05010001");
-			UserRunnable.orb = ORB.init(args, p);
-			// getting NameService
-			org.omg.CORBA.Object obj = UserRunnable.orb.resolve_initial_references("NameService");
-			NamingContextExt ncRef = org.omg.CosNaming.NamingContextExtHelper.narrow(obj);
-
-			// resolving servant name
-			obj = ncRef.resolve_str("chatserver_yzioaw");
-			server = ServerHelper.narrow(obj);
-
-			// creating servant
-			userPoa = new UserPOAImpl();
-			// connecting servant to ORB
-			user = userPoa._this(UserRunnable.orb);
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-	}
-
-	public void connectionDialog() {
-		if (this.chat == null) {
-			String nick = "";
-			char[] mdp = null;
-			int cancel = 0;
-			JTextField utilisateur = new JTextField();
-			JPasswordField passe = new JPasswordField();
-			while (cancel != -1 && cancel != 2 && (nick == null || nick.equalsIgnoreCase("") || mdp == null || mdp.toString().equalsIgnoreCase(""))) {
-				cancel = JOptionPane.showOptionDialog(null, new Object[] { "Identifiant :", utilisateur, "Mot de passe :", passe }, "Connexion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
-				nick = utilisateur.getText();
-				mdp = passe.getPassword();
-				if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
-					this.userPoa.setNick(nick);
-					this.userPoa.setMdp(new String(mdp));
-					if (!this.subscribe()) {
-						nick = "";
-						mdp = new char[0];
-					}
-				}
-			}
-		} else {
-			this.chat.setLocationRelativeTo(null);
-			this.chat.setVisible(true);
-		}
-	}
-
-	/**
-	 * Create the application.
-	 * 
-	 * @param args
-	 */
 	public UserIHM(String[] args) {
 		initializeORB(args);
 
-		bienvenue = new Bienvenue();
+		final UserIHM userIHM = this;
+		bienvenue = new BienvenueFrame();
 		bienvenue.addWindowListener(new WindowListener() {
 
 			@Override
@@ -160,7 +93,7 @@ public class UserIHM {
 		});
 		bienvenue.getCreate().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				formulaire = Formulaire.getInstance(server);
+				formulaire = FormulaireFrame.getInstance(userIHM);
 				formulaire.setLocationRelativeTo(null);
 				formulaire.setVisible(true);
 			}
@@ -168,8 +101,8 @@ public class UserIHM {
 		bienvenue.getConnect().addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				connectionDialog();
-				if (userPoa.getNick() != null && userPoa.getMdp() != null) {
-					chat = Chat.getInstance(userPoa, server);
+				if (userPoa.getAvatar().pseudo != null && userPoa.getAvatar().code_acces != null) {
+					chat = ChatFrame.getInstance(userIHM);
 					chat.setLocationRelativeTo(null);
 					chat.setVisible(true);
 					bienvenue.setVisible(false);
@@ -191,22 +124,109 @@ public class UserIHM {
 		});
 	}
 
+	public Server getServer() {
+		return server;
+	}
+
+	public UserPOAImpl getUserPoa() {
+		return userPoa;
+	}
+
+	public static void main(final String[] args) {
+		try {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					new UserIHM(args);
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void initializeORB(String[] args) {
+		try {
+			Properties p = new Properties();
+			// UTF-8, UTF-16
+			p.setProperty("com.sun.CORBA.codeset.charsets", "0x05010001, 0x00010109");
+			// UTF-16, UTF-8
+			p.setProperty("com.sun.CORBA.codeset.wcharsets", "0x00010109, 0x05010001");
+			UserRunnable.orb = ORB.init(args, p);
+			// getting NameService
+			org.omg.CORBA.Object obj = UserRunnable.orb.resolve_initial_references("NameService");
+			NamingContextExt ncRef = org.omg.CosNaming.NamingContextExtHelper.narrow(obj);
+
+			// resolving servant name
+			obj = ncRef.resolve_str("chatserver_yzioaw");
+			server = ServerHelper.narrow(obj);
+
+			// creating servant
+			userPoa = new UserPOAImpl(this);
+			// connecting servant to ORB
+			user = userPoa._this(UserRunnable.orb);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void connectionDialog() {
+		if (this.chat == null) {
+			String nick = "";
+			char[] mdp = null;
+			int cancel = 0;
+			JTextField utilisateur = new JTextField();
+			JPasswordField passe = new JPasswordField();
+			while (cancel != -1 && cancel != 2 && (nick == null || nick.equalsIgnoreCase("") || mdp == null || mdp.toString().equalsIgnoreCase(""))) {
+				cancel = JOptionPane.showOptionDialog(null, new Object[] { "Pseudo :", utilisateur, "Mot de passe :", passe }, "Connexion", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+				nick = utilisateur.getText();
+				mdp = passe.getPassword();
+				if (cancel == 0 && !nick.equalsIgnoreCase("") && !mdp.toString().equalsIgnoreCase("")) {
+					this.userPoa.getAvatar().pseudo = nick;
+					this.userPoa.getAvatar().code_acces = new String(mdp);
+					if (!this.subscribe()) {
+						nick = "";
+						mdp = new char[0];
+					}
+				}
+			}
+		} else {
+			this.chat.setLocationRelativeTo(null);
+			this.chat.setVisible(true);
+		}
+	}
+
+	public void kickedDialog() {
+		System.out.println("kickedDialog " + userPoa.getAvatar().pseudo);
+		try {
+			server.unsubscribe(UserRunnable.id);
+		} catch (UnknownID e1) {
+			e1.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
+		// JOptionPane.showMessageDialog(chat,
+		// "L'administrateur vous a déconnecté.", "Déconnexion",
+		// JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	public boolean subscribe() {
 		userRunnableThread = new Thread(new UserRunnable());
 		try {
-			UserRunnable.id = server.subscribe(this.userPoa.getNick(), this.userPoa.getMdp(), user);
+			UserRunnable.id = server.subscribe(this.userPoa.getAvatar().pseudo, this.userPoa.getAvatar().code_acces, user);
 			userRunnableThread.start();
 		} catch (NameAlreadyUsed e) {
 			JOptionPane.showMessageDialog(null, "Cet utilisateur est déjà connecté.", "Erreur de connexion", JOptionPane.ERROR_MESSAGE);
-			this.userPoa.setNick(null);
-			this.userPoa.setMdp(null);
+			this.userPoa.getAvatar().pseudo = null;
+			this.userPoa.getAvatar().code_acces = null;
 			return false;
 		} catch (WrongPassword e) {
 			JOptionPane.showMessageDialog(null, "Les informations de connexion ne correspondent pas.", "Erreur d'identification", JOptionPane.ERROR_MESSAGE);
-			this.userPoa.setNick(null);
-			this.userPoa.setMdp(null);
+			this.userPoa.getAvatar().pseudo = null;
+			this.userPoa.getAvatar().code_acces = null;
 			return false;
 		}
 		return true;
 	}
+
 }

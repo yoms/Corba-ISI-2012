@@ -17,6 +17,7 @@ public class UserRunnable implements Runnable {
 			manager.activate();
 			orb.run();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
