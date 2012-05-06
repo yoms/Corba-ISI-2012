@@ -15,7 +15,7 @@ import fr.corba.client.UserIHM;
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.UnknownID;
 
-public class AvatarsPanel extends JPanel {
+public class AvatarsAdminPanel extends JPanel {
 	private JTable table;
 
 	private UserIHM userIHM;
@@ -23,14 +23,13 @@ public class AvatarsPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public AvatarsPanel(UserIHM u) {
+	public AvatarsAdminPanel(UserIHM u) {
 		this.userIHM = u;
 		setLayout(new BorderLayout());
 		table = new JTable();
 		JScrollPane scrollPane = new JScrollPane(table);
 		table.setFillsViewportHeight(true);
 		DefaultTableModel model = new DefaultTableModel() {
-
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				// all cells false
@@ -44,7 +43,7 @@ public class AvatarsPanel extends JPanel {
 		model.addColumn("Piece");
 		Avatar avatars[] = userIHM.getServer().requestExistingAvatars();
 		for (Avatar attributs : avatars) {
-			String[] att = { attributs.pseudo, attributs.taille, attributs.humeur, attributs.sexe, attributs.piece_courante };
+			String[] att = { attributs.pseudo, attributs.taille, attributs.humeur, attributs.sexe, Integer.toString(attributs.id_piece) };
 			model.addRow(att);
 		}
 		table.setModel(model);

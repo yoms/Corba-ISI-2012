@@ -8,9 +8,8 @@ import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
-import org.omg.CORBA.Object;
-
 import fr.corba.idl.Code.Avatar;
+import fr.corba.idl.Code.Piece;
 import fr.corba.idl.Code.UserPOA;
 
 public class UserPOAImpl extends UserPOA {
@@ -27,6 +26,10 @@ public class UserPOAImpl extends UserPOA {
 
 	public Avatar getAvatar() {
 		return avatar;
+	}
+
+	public void setAvatar(Avatar avatar) {
+		this.avatar = avatar;
 	}
 
 	public JTextPane getChatHistory() {
@@ -83,7 +86,7 @@ public class UserPOAImpl extends UserPOA {
 	}
 
 	@Override
-	public void receiveRoom(Object room) {
+	public void receivePiece(Piece room) {
 		// TODO Auto-generated method stub
 		System.out.println("receiveRoom(Object room)");
 	}

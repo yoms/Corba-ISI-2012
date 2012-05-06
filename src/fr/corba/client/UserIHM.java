@@ -15,7 +15,7 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 
 import fr.corba.client.gui.BienvenueFrame;
-import fr.corba.client.gui.ChatFrame;
+import fr.corba.client.gui.VirtualWorldFrame;
 import fr.corba.client.gui.FormulaireFrame;
 import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.Server;
@@ -31,7 +31,7 @@ public class UserIHM {
 	private User user;
 	private UserPOAImpl userPoa;
 
-	private ChatFrame chat;
+	private VirtualWorldFrame chat;
 	private FormulaireFrame formulaire;
 	private BienvenueFrame bienvenue;
 
@@ -102,7 +102,7 @@ public class UserIHM {
 			public void actionPerformed(ActionEvent e) {
 				connectionDialog();
 				if (userPoa.getAvatar().pseudo != null && userPoa.getAvatar().code_acces != null) {
-					chat = ChatFrame.getInstance(userIHM);
+					chat = VirtualWorldFrame.getInstance(userIHM);
 					chat.setLocationRelativeTo(null);
 					chat.setVisible(true);
 					bienvenue.setVisible(false);
@@ -226,6 +226,7 @@ public class UserIHM {
 			this.userPoa.getAvatar().code_acces = null;
 			return false;
 		}
+		this.userPoa.setAvatar(server.getAvatar(this.userPoa.getAvatar().pseudo));
 		return true;
 	}
 

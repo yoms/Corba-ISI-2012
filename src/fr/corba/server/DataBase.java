@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import fr.corba.idl.Code.Avatar;
+import fr.corba.idl.Code.Piece;
 
 public class DataBase {
 	Connection conn;
@@ -18,61 +19,16 @@ public class DataBase {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			conn = DriverManager.getConnection("jdbc:sqlite:corba.db");
-			createDataBase();
+			if (createDataBase())
+				System.out.println("DataBase created");
+			if (createAdmins())
+				System.out.println("Admins added");
+			if (createRooms())
+				System.out.println("Rooms added");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	private boolean createDataBase() {
-		try {
-			int ch;
-			StringBuffer strContent = new StringBuffer();
-			URI uri = DataBase.class.getResource("../../../ressource/schema.sql").toURI();
-			FileInputStream fin = new FileInputStream(uri.getPath());
-
-			while ((ch = fin.read()) != -1)
-				strContent.append((char) ch);
-
-			Statement stat = conn.createStatement();
-			stat.executeUpdate(strContent.toString());
-
-			Statement verifstat = conn.createStatement();
-			ResultSet rs = verifstat.executeQuery("select * from Avatar where pseudo = 'yoms';");
-			if (!rs.next()) {
-				System.out.println("Save base users ");
-				PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, '', ?, ?);");
-
-				prep.setString(1, "yoms");
-				prep.setString(2, "superyoms");
-				prep.setString(3, "Geant");
-				prep.setString(4, "Nouveau");
-				prep.setString(5, "Masculin");
-				prep.setInt(6, 1);
-				prep.setInt(7, 0);
-				prep.addBatch();
-
-				prep.setString(1, "alex");
-				prep.setString(2, "superalex");
-				prep.setString(3, "Grand");
-				prep.setString(4, "Nouveau");
-				prep.setString(5, "Masculin");
-				prep.setInt(6, 1);
-				prep.setInt(7, 0);
-				prep.addBatch();
-
-				conn.setAutoCommit(false);
-				prep.executeBatch();
-				conn.setAutoCommit(true);
-			}
-			verifstat.close();
-			stat.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return true;
 	}
 
 	public boolean verifyUser(String nick, String password) {
@@ -119,16 +75,90 @@ public class DataBase {
 		return code_acces;
 	}
 
-	private String generateCodeAcces() {
-		int length = 5;
-		String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-		int charLength = chars.length();
-		StringBuilder pass = new StringBuilder(charLength);
-		for (int x = 0; x < length; x++) {
-			int i = (int) (Math.random() * charLength);
-			pass.append(chars.charAt(i));
+	public Piece getPiece(int idPiece) {
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select id, nom, id_nord, id_sud, id_est, id_ouest from Piece where id = '" + idPiece + "';");
+			rs.next();
+			int rowid = rs.getInt("id");
+			String nom = rs.getString("nom");
+			int id_nord = rs.getInt("id_nord");
+			int id_sud = rs.getInt("id_sud");
+			int id_est = rs.getInt("id_est");
+			int id_ouest = rs.getInt("id_ouest");
+
+			rs = stat.executeQuery("select id, pseudo, taille, humeur, sexe, id_piece, est_connecte from Avatar where id_piece = '" + rowid + "';");
+			ArrayList<Avatar> avatars = new ArrayList<Avatar>();
+			while (rs.next()) {
+				Avatar avatar = new Avatar(rs.getInt("id"), rs.getString("pseudo"), "", rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), false, rs.getBoolean("est_connecte"));
+				avatars.add(avatar);
+			}
+			Avatar ret[] = new Avatar[avatars.size()];
+			Piece piece = new Piece(rowid, nom, id_nord, id_sud, id_est, id_ouest, avatars.toArray(ret));
+			stat.close();
+			return piece;
+		} catch (Exception e) {
+			System.out.println();
+			e.printStackTrace();
 		}
-		return pass.toString();
+		return null;
+	}
+
+	public boolean isAdmin(String nick, String password) {
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select rowid from Avatar where pseudo = '" + nick + "' and code_acces = '" + password + "' and est_admin = 1;");
+			boolean ret = rs.next();
+			stat.close();
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public Avatar getAvatar(String nick) {
+		Avatar avatar = new Avatar();
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select id, pseudo, code_acces, taille, humeur, sexe, id_piece, est_admin, est_connecte from Avatar where pseudo ='" + nick + "';");
+			rs.next();
+			avatar = new Avatar(rs.getInt("id"), rs.getString("pseudo"), rs.getString("code_acces"), rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), rs.getBoolean("est_admin"), rs.getBoolean("est_connecte"));
+
+			stat.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return avatar;
+	}
+
+	public Avatar[] selectAllAvatars() {
+		ArrayList<Avatar> avatars = new ArrayList<Avatar>();
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select pseudo, taille, humeur, sexe, id_piece from Avatar;");
+			while (rs.next()) {
+				Avatar avatar = new Avatar(0, rs.getString("pseudo"), "", rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), false, false);
+				avatars.add(avatar);
+			}
+			stat.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Avatar ret[] = new Avatar[avatars.size()];
+		return avatars.toArray(ret);
+	}
+
+	public boolean setConnected(String nick, boolean isConnected) {
+		int ret = 0;
+		try {
+			Statement stat = conn.createStatement();
+			ret = stat.executeUpdate("update Avatar set est_connecte = " + fromBooleanToInt(isConnected) + " where pseudo = '" + nick + "'");
+			stat.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret == 1;
 	}
 
 	public boolean existsInAvatar(String column, String value) {
@@ -145,33 +175,129 @@ public class DataBase {
 		return false;
 	}
 
-	public boolean isAdmin(String nick, String password) {
+	private int fromBooleanToInt(boolean b) {
+		return (b) ? 1 : 0;
+	}
+
+	private String generateCodeAcces() {
+		int length = 5;
+		String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		int charLength = chars.length();
+		StringBuilder pass = new StringBuilder(charLength);
+		for (int x = 0; x < length; x++) {
+			int i = (int) (Math.random() * charLength);
+			pass.append(chars.charAt(i));
+		}
+		return pass.toString();
+	}
+
+	private boolean createDataBase() {
 		try {
 			Statement stat = conn.createStatement();
-			ResultSet rs = stat.executeQuery("select rowid from Avatar where pseudo = '" + nick + "' and code_acces = '" + password + "' and est_admin = 1;");
-			boolean ret = rs.next();
+			int ch;
+			StringBuffer strContent = new StringBuffer();
+			URI uri = DataBase.class.getResource("../../../ressource/schema.sql").toURI();
+			FileInputStream fin = new FileInputStream(uri.getPath());
+
+			while ((ch = fin.read()) != -1) {
+				strContent.append((char) ch);
+				if ((char) ch == ';') {
+					stat.executeUpdate(strContent.toString());
+					strContent = new StringBuffer();
+				}
+			}
+
 			stat.close();
-			return ret;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return false;
+
+		return true;
 	}
 
-	public Avatar[] selectAllAvatars() {
-		ArrayList<Avatar> avatars = new ArrayList<Avatar>();
+	private boolean createAdmins() {
 		try {
 			Statement stat = conn.createStatement();
-			ResultSet rs = stat.executeQuery("select pseudo, taille, humeur, sexe, piece_courante from Avatar;");
-			while (rs.next()) {
-				Avatar avatar = new Avatar(0, rs.getString("pseudo"), "", rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getString("piece_courante"), false, false);
-				avatars.add(avatar);
+			ResultSet rs = stat.executeQuery("select * from Avatar where pseudo = 'yoms';");
+			if (!rs.next()) {
+				PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+				prep.setString(1, "yoms");
+				prep.setString(2, "superyoms");
+				prep.setString(3, "Geant");
+				prep.setString(4, "Nouveau");
+				prep.setString(5, "Masculin");
+				prep.setInt(6, 1);
+				prep.setInt(7, 1);
+				prep.setInt(8, 0);
+				prep.addBatch();
+
+				prep.setString(1, "alex");
+				prep.setString(2, "superalex");
+				prep.setString(3, "Grand");
+				prep.setString(4, "Nouveau");
+				prep.setString(5, "Masculin");
+				prep.setInt(6, 1);
+				prep.setInt(7, 1);
+				prep.setInt(8, 0);
+				prep.addBatch();
+
+				conn.setAutoCommit(false);
+				prep.executeBatch();
+				conn.setAutoCommit(true);
 			}
 			stat.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Avatar ret[] = new Avatar[avatars.size()];
-		return avatars.toArray(ret);
+		return true;
+	}
+
+	private boolean createRooms() {
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select * from Piece");
+			if (!rs.next()) {
+				PreparedStatement prep = conn.prepareStatement("insert into Piece values (null, ?, ?, ?, ?, ?);");
+				int x = 3, y = 3, roomNumber = 1;
+				for (int i = 0; i < x; i++) {
+					for (int j = 0; j < y; j++) {
+						prep.setString(1, "Room" + roomNumber);
+
+						// Nord
+						if (i == 0)
+							prep.setNull(2, i);
+						else
+							prep.setInt(2, roomNumber - x);
+						// Sud
+						if (i == x - 1)
+							prep.setNull(3, i);
+						else
+							prep.setInt(3, roomNumber + x);
+						// Est
+						if (j == y - 1)
+							prep.setNull(4, j);
+						else
+							prep.setInt(4, roomNumber + 1);
+						// Ouest
+						if (j == 0)
+							prep.setNull(5, j);
+						else
+							prep.setInt(5, roomNumber - 1);
+
+						prep.addBatch();
+						roomNumber++;
+					}
+				}
+
+				conn.setAutoCommit(false);
+				prep.executeBatch();
+				conn.setAutoCommit(true);
+			}
+			stat.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 }

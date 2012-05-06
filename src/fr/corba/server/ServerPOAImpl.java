@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.NameAlreadyUsed;
+import fr.corba.idl.Code.Piece;
 import fr.corba.idl.Code.ServerPOA;
 import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
@@ -41,6 +42,7 @@ public class ServerPOAImpl extends ServerPOA {
 			throw new NameAlreadyUsed();
 		if (!db.verifyUser(nick, password))
 			throw new WrongPassword();
+		db.setConnected(nick, true);
 		nicks.add(nick);
 		String id = UUID.randomUUID().toString();
 		System.out.println("subscribe: " + nick + " -> " + id);
@@ -49,8 +51,10 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	public void unsubscribe(String id) throws UnknownID {
-		System.out.println("unsubscribe: " + clients.get(id).nick + " -> " + id);
+		String nick = clients.get(id).nick;
+		System.out.println("unsubscribe: " + nick + " -> " + id);
 		Client c = clients.remove(id);
+		db.setConnected(nick, false);
 		if (c == null)
 			throw new UnknownID();
 		nicks.remove(c.nick);
@@ -113,15 +117,21 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	@Override
-	public void changeRoom(String myId) {
+	public void changePiece(String myId) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void requestRoomContent(String roomName) {
+	public Piece requestPieceContent(int idPiece) {
 		// TODO Auto-generated method stub
+		return db.getPiece(idPiece);
+	}
 
+	@Override
+	public Avatar getAvatar(String nick) {
+		// TODO Auto-generated method stub
+		return db.getAvatar(nick);
 	}
 
 }

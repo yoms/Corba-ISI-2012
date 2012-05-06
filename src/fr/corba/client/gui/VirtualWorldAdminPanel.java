@@ -11,14 +11,14 @@ import javax.swing.JPanel;
 
 import fr.corba.client.UserIHM;
 
-public class VirtualWorldPanel extends JPanel {
+public class VirtualWorldAdminPanel extends JPanel {
 
 	private UserIHM userIHM;
 
 	/**
 	 * Create the panel.
 	 */
-	public VirtualWorldPanel(UserIHM u) {
+	public VirtualWorldAdminPanel(UserIHM u) {
 		userIHM = u;
 		setLayout(new GridLayout(1, 0, 0, 0));
 

@@ -15,25 +15,42 @@ module Code {
 		string taille;
 		string humeur;
 		string sexe;
-		string piece_courante;
+		long id_piece;
 		boolean est_admin;
 		boolean est_connecte;
 	};
 	
 	typedef sequence<Avatar> Avatars;
 	
+	struct Post {
+		long id;
+		string contenu;
+		string date_heure;
+		long id_avatar;
+	};
+	
+	struct Piece {
+		long id;
+		string nom;
+		long id_nord;
+		long id_sud;
+		long id_est;
+		long id_ouest;
+		Avatars avatars;
+	};
+	
 	interface User{
 		void receiveChatMessage(in string nick, in string text);
 		void receiveKicked();
 		
-		void receiveRoom(in Object room);
+		void receivePiece(in Piece Piece);
 		void receiveMoved(in string nick, in short x, in short y);
 	};
 	
 	interface Admin : User{
 		void receiveExistingAvatars(in Object list);
 		void receiveIsKicked(in boolean kicked);
-		void receiveRoomContent(in Object room);
+		void receivePieceContent(in Piece Piece);
 		void receiveConnectedUsers(in Object list);
 	};
 	interface Server
@@ -45,10 +62,11 @@ module Code {
 		boolean isAdmin(in string nick, in string password);
 		Avatars requestExistingAvatars();		
 		void requestKick(in string nick) raises(UnknownID);
+		Avatar getAvatar(in string nick);
 		
 		void requestMove(in short x, in short y);
-		void changeRoom(in string myId);		
-		void requestRoomContent(in string roomName);
+		void changePiece(in string myId);		
+		Piece requestPieceContent(in long idPiece);
 	};
 
 };
