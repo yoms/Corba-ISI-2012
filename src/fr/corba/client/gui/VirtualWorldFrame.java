@@ -114,15 +114,6 @@ public class VirtualWorldFrame extends JFrame {
 
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(0, 2, 0, 0));
-		if (userIHM.getServer().isAdmin(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().code_acces)) {
-			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-			getContentPane().add(tabbedPane);
-			tabbedPane.addTab("Jeu", null, panel, null);
-			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldAdminPanel(userIHM), null);
-			tabbedPane.addTab("Avatars", null, new AvatarsAdminPanel(userIHM), null);
-		} else {
-			getContentPane().add(panel);
-		}
 
 		JPanel worldPanel = new JPanel();
 		panel.add(worldPanel);
@@ -130,7 +121,19 @@ public class VirtualWorldFrame extends JFrame {
 		worldPanel.setLayout(new BoxLayout(worldPanel, BoxLayout.Y_AXIS));
 		canvas = new Canvas();
 		canvas.setBackground(Color.WHITE);
-		canvas.setPreferredSize(new Dimension(400, 650));
+		
+		if (userIHM.getServer().isAdmin(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().code_acces)) {
+			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+			getContentPane().add(tabbedPane);
+			tabbedPane.addTab("Jeu", null, panel, null);
+			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldAdminPanel(userIHM), null);
+			tabbedPane.addTab("Avatars", null, new AvatarsAdminPanel(userIHM), null);
+			canvas.setPreferredSize(new Dimension(400, 600));
+		} else {
+			getContentPane().add(panel);
+			canvas.setPreferredSize(new Dimension(400, 650));
+		}
+		
 		worldPanel.add(canvas);
 
 		worldPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -160,7 +163,8 @@ public class VirtualWorldFrame extends JFrame {
 				try {
 					tip = avatars[realRowIndex].taille + " - " + avatars[realRowIndex].humeur + " - " + avatars[realRowIndex].sexe;
 				} catch (RuntimeException e1) {
-					// catch null pointer exception if mouse is over an empty line
+					// catch null pointer exception if mouse is over an empty
+					// line
 				}
 				return tip;
 			}
@@ -177,23 +181,23 @@ public class VirtualWorldFrame extends JFrame {
 		direction.add(new JPanel());
 		JButton jb = new JButton("Nord");
 		jb.setPreferredSize(new Dimension(50, 30));
-		if(this.piece.id_nord==0)
+		if (this.piece.id_nord == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		direction.add(new JPanel());
 		jb = new JButton("Ouest");
 		jb.setPreferredSize(new Dimension(50, 30));
-		if(this.piece.id_ouest==0)
+		if (this.piece.id_ouest == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		jb = new JButton("Sud");
 		jb.setPreferredSize(new Dimension(50, 30));
-		if(this.piece.id_sud==0)
+		if (this.piece.id_sud == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		jb = new JButton("Est");
 		jb.setPreferredSize(new Dimension(50, 30));
-		if(this.piece.id_est==0)
+		if (this.piece.id_est == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		worldPanelBottom.add(direction);
