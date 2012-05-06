@@ -177,16 +177,24 @@ public class VirtualWorldFrame extends JFrame {
 		direction.add(new JPanel());
 		JButton jb = new JButton("Nord");
 		jb.setPreferredSize(new Dimension(50, 30));
+		if(this.piece.id_nord==0)
+			jb.setEnabled(false);
 		direction.add(jb);
 		direction.add(new JPanel());
-		jb = new JButton("Est");
+		jb = new JButton("Ouest");
 		jb.setPreferredSize(new Dimension(50, 30));
+		if(this.piece.id_ouest==0)
+			jb.setEnabled(false);
 		direction.add(jb);
 		jb = new JButton("Sud");
 		jb.setPreferredSize(new Dimension(50, 30));
+		if(this.piece.id_sud==0)
+			jb.setEnabled(false);
 		direction.add(jb);
-		jb = new JButton("Ouest");
+		jb = new JButton("Est");
 		jb.setPreferredSize(new Dimension(50, 30));
+		if(this.piece.id_est==0)
+			jb.setEnabled(false);
 		direction.add(jb);
 		worldPanelBottom.add(direction);
 		worldPanel.add(worldPanelBottom);
