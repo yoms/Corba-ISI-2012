@@ -60,7 +60,7 @@ public class VirtualWorldFrame extends JFrame {
 		this.piece = userIHM.getServer().requestPieceContent(u.getUserPoa().getAvatar().id_piece);
 		this.setBounds(100, 100, 836, 605);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setPreferredSize(new Dimension(800, 500));
+		this.setSize(new Dimension(800, 500));
 		this.setMinimumSize(this.getPreferredSize());
 		this.addWindowListener(new WindowListener() {
 
@@ -121,19 +121,19 @@ public class VirtualWorldFrame extends JFrame {
 		worldPanel.setLayout(new BoxLayout(worldPanel, BoxLayout.Y_AXIS));
 		canvas = new Canvas();
 		canvas.setBackground(Color.WHITE);
-		
+
 		if (userIHM.getServer().isAdmin(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().code_acces)) {
 			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 			getContentPane().add(tabbedPane);
 			tabbedPane.addTab("Jeu", null, panel, null);
 			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldAdminPanel(userIHM), null);
 			tabbedPane.addTab("Avatars", null, new AvatarsAdminPanel(userIHM), null);
-			canvas.setPreferredSize(new Dimension(400, 600));
+			canvas.setSize(new Dimension(400, 340));
 		} else {
 			getContentPane().add(panel);
-			canvas.setPreferredSize(new Dimension(400, 650));
+			canvas.setSize(new Dimension(400, 340));
 		}
-		
+
 		worldPanel.add(canvas);
 
 		worldPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -180,23 +180,19 @@ public class VirtualWorldFrame extends JFrame {
 		direction.setLayout(new GridLayout(2, 3, 0, 0));
 		direction.add(new JPanel());
 		JButton jb = new JButton("Nord");
-		jb.setPreferredSize(new Dimension(50, 30));
 		if (this.piece.id_nord == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		direction.add(new JPanel());
 		jb = new JButton("Ouest");
-		jb.setPreferredSize(new Dimension(50, 30));
 		if (this.piece.id_ouest == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		jb = new JButton("Sud");
-		jb.setPreferredSize(new Dimension(50, 30));
 		if (this.piece.id_sud == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
 		jb = new JButton("Est");
-		jb.setPreferredSize(new Dimension(50, 30));
 		if (this.piece.id_est == 0)
 			jb.setEnabled(false);
 		direction.add(jb);
@@ -213,7 +209,7 @@ public class VirtualWorldFrame extends JFrame {
 		scrollPane = new JScrollPane(chatHistory);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setPreferredSize(new Dimension(200, 50));
+		scrollPane.setPreferredSize(new Dimension(400, 450));
 		chatPanel.add(scrollPane);
 
 		StyledDocument doc = chatHistory.getStyledDocument();
@@ -241,7 +237,7 @@ public class VirtualWorldFrame extends JFrame {
 		chatTextBox = new JTextField();
 		sendPanel.add(chatTextBox);
 		chatTextBox.setHorizontalAlignment(SwingConstants.TRAILING);
-		chatTextBox.setMaximumSize(new Dimension(800, 500));
+		chatTextBox.setSize(new Dimension(400, 50));
 		chatTextBox.setColumns(10);
 		chatTextBox.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
@@ -276,6 +272,7 @@ public class VirtualWorldFrame extends JFrame {
 		chatTextBox.requestFocusInWindow();
 		chatTextBox.requestFocus();
 
+		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 	}
