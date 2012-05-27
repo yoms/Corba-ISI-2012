@@ -78,7 +78,7 @@ public class DataBase {
 	public Piece getPiece(int idPiece) {
 		try {
 			Statement stat = conn.createStatement();
-			ResultSet rs = stat.executeQuery("select id, nom, id_nord, id_sud, id_est, id_ouest from Piece where id = '" + idPiece + "';");
+			ResultSet rs = stat.executeQuery("select id, posX, posY, nom, id_nord, id_sud, id_est, id_ouest from Piece where id = '" + idPiece + "';");
 			rs.next();
 			int rowid = rs.getInt("id");
 			String nom = rs.getString("nom");
@@ -86,6 +86,8 @@ public class DataBase {
 			int id_sud = rs.getInt("id_sud");
 			int id_est = rs.getInt("id_est");
 			int id_ouest = rs.getInt("id_ouest");
+			int posX = rs.getInt("posX");
+			int posY = rs.getInt("posY");
 
 			rs = stat.executeQuery("select id, pseudo, taille, humeur, sexe, id_piece, est_connecte from Avatar where id_piece = '" + rowid + "';");
 			ArrayList<Avatar> avatars = new ArrayList<Avatar>();
@@ -94,7 +96,7 @@ public class DataBase {
 				avatars.add(avatar);
 			}
 			Avatar ret[] = new Avatar[avatars.size()];
-			Piece piece = new Piece(rowid, nom, id_nord, id_sud, id_est, id_ouest, avatars.toArray(ret));
+			Piece piece = new Piece(rowid, posX, posY, nom, id_nord, id_sud, id_est, id_ouest, avatars.toArray(ret));
 			stat.close();
 			return piece;
 		} catch (Exception e) {
@@ -258,32 +260,34 @@ public class DataBase {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select * from Piece");
 			if (!rs.next()) {
-				PreparedStatement prep = conn.prepareStatement("insert into Piece values (null, ?, ?, ?, ?, ?);");
+				PreparedStatement prep = conn.prepareStatement("insert into Piece values (null, ?, ?, ?, ?, ?, ?, ?);");
 				int x = 3, y = 3, roomNumber = 1;
 				for (int i = 0; i < x; i++) {
 					for (int j = 0; j < y; j++) {
-						prep.setString(1, "Room" + roomNumber);
+						prep.setInt(1, j);
+						prep.setInt(2, i);
+						prep.setString(3, "Room" + roomNumber);
 
 						// Nord
 						if (i == 0)
-							prep.setNull(2, i);
+							prep.setNull(4, i);
 						else
-							prep.setInt(2, roomNumber - x);
+							prep.setInt(4, roomNumber - x);
 						// Sud
 						if (i == x - 1)
-							prep.setNull(3, i);
+							prep.setNull(5, i);
 						else
-							prep.setInt(3, roomNumber + x);
+							prep.setInt(5, roomNumber + x);
 						// Est
 						if (j == y - 1)
-							prep.setNull(4, j);
+							prep.setNull(6, j);
 						else
-							prep.setInt(4, roomNumber + 1);
+							prep.setInt(6, roomNumber + 1);
 						// Ouest
 						if (j == 0)
-							prep.setNull(5, j);
+							prep.setNull(7, j);
 						else
-							prep.setInt(5, roomNumber - 1);
+							prep.setInt(7, roomNumber - 1);
 
 						prep.addBatch();
 						roomNumber++;

@@ -201,8 +201,6 @@ public class UserIHM {
 			server.unsubscribe(UserRunnable.id);
 		} catch (UnknownID e1) {
 			e1.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		System.exit(0);
 		// JOptionPane.showMessageDialog(chat,

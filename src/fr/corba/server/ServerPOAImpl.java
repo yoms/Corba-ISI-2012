@@ -93,21 +93,16 @@ public class ServerPOAImpl extends ServerPOA {
 
 	@Override
 	public void requestKick(String nick) throws UnknownID {
-		try {
-			Client kicked = null;
-			for (Client client : clients.values()) {
-				if (client.nick.equalsIgnoreCase(nick)) {
-					kicked = client;
-				}
+		Client kicked = null;
+		for (Client client : clients.values()) {
+			if (client.nick.equalsIgnoreCase(nick)) {
+				kicked = client;
 			}
-			if (kicked == null)
-				throw new UnknownID();
-			System.out.println("requestKick: " + nick);
-			kicked.user.receiveKicked();
-
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		if (kicked == null)
+			throw new UnknownID();
+		System.out.println("requestKick: " + nick);
+		kicked.user.receiveKicked();
 	}
 
 	@Override

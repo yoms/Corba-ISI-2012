@@ -75,14 +75,8 @@ public class UserPOAImpl extends UserPOA {
 
 	@Override
 	public void receiveKicked() {
-		try {
-			System.out.println("receiveKicked");
-			this.userIHM.kickedDialog();
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+		System.out.println("receiveKicked");
+		this.userIHM.kickedDialog();
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package fr.corba.client.gui;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -119,7 +120,31 @@ public class VirtualWorldFrame extends JFrame {
 		panel.add(worldPanel);
 
 		worldPanel.setLayout(new BoxLayout(worldPanel, BoxLayout.Y_AXIS));
-		canvas = new Canvas();
+		canvas = new Canvas() {
+			public void paint(Graphics g) {
+				this.setSize(new Dimension(400, 340));
+				int nbX = 3, nbY = 3;
+				int rectWitdh = 50, rectLength = 50;
+				int posX, posY = (this.getHeight() - (rectLength * nbY)) / 2;
+
+				for (int y = 0; y < 3; y++) {
+					posX = (this.getWidth() - (rectWitdh * nbX)) / 2;
+					for (int x = 0; x < 3; x++) {
+						// Les bordures sont noires
+						g.setColor(Color.black);
+						g.drawRect(posX, posY, rectWitdh, rectLength);
+						if (piece.posX == x && piece.posY == y) {
+							// Le contenu est vert
+							g.setColor(Color.green);
+							g.fillRect(posX + 1, posY + 1, rectWitdh - 1, rectLength - 1);
+						}
+						posX += rectWitdh;
+					}
+					posY += rectLength;
+				}
+			}
+		};
+		canvas.setSize(new Dimension(400, 340));
 		canvas.setBackground(Color.WHITE);
 
 		if (userIHM.getServer().isAdmin(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().code_acces)) {
@@ -128,10 +153,8 @@ public class VirtualWorldFrame extends JFrame {
 			tabbedPane.addTab("Jeu", null, panel, null);
 			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldAdminPanel(userIHM), null);
 			tabbedPane.addTab("Avatars", null, new AvatarsAdminPanel(userIHM), null);
-			canvas.setSize(new Dimension(400, 340));
 		} else {
 			getContentPane().add(panel);
-			canvas.setSize(new Dimension(400, 340));
 		}
 
 		worldPanel.add(canvas);
@@ -179,23 +202,114 @@ public class VirtualWorldFrame extends JFrame {
 		JPanel direction = new JPanel();
 		direction.setLayout(new GridLayout(2, 3, 0, 0));
 		direction.add(new JPanel());
-		JButton jb = new JButton("Nord");
+		final JButton jbNord = new JButton("Nord");
 		if (this.piece.id_nord == 0)
-			jb.setEnabled(false);
-		direction.add(jb);
+			jbNord.setEnabled(false);
+		jbNord.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (jbNord.isEnabled()) {
+					userIHM.getUserPoa().getAvatar().id_piece = piece.id_nord;
+					VirtualWorldFrame v = instance;
+					instance = new VirtualWorldFrame(userIHM);
+					v.dispose();
+				}
+			}
+
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+		direction.add(jbNord);
 		direction.add(new JPanel());
-		jb = new JButton("Ouest");
+		
+		final JButton jbOuest = new JButton("Ouest");
 		if (this.piece.id_ouest == 0)
-			jb.setEnabled(false);
-		direction.add(jb);
-		jb = new JButton("Sud");
+			jbOuest.setEnabled(false);
+		jbOuest.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (jbOuest.isEnabled()) {
+					userIHM.getUserPoa().getAvatar().id_piece = piece.id_ouest;
+					VirtualWorldFrame v = instance;
+					instance = new VirtualWorldFrame(userIHM);
+					v.dispose();
+				}
+			}
+
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+		direction.add(jbOuest);
+		
+		final JButton jbSud = new JButton("Sud");
 		if (this.piece.id_sud == 0)
-			jb.setEnabled(false);
-		direction.add(jb);
-		jb = new JButton("Est");
+			jbSud.setEnabled(false);
+		jbSud.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (jbSud.isEnabled()) {
+					userIHM.getUserPoa().getAvatar().id_piece = piece.id_sud;
+					VirtualWorldFrame v = instance;
+					instance = new VirtualWorldFrame(userIHM);
+					v.dispose();
+				}
+			}
+
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+		direction.add(jbSud);
+		
+		final JButton jbEst = new JButton("Est");
 		if (this.piece.id_est == 0)
-			jb.setEnabled(false);
-		direction.add(jb);
+			jbEst.setEnabled(false);
+		jbEst.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				if (jbEst.isEnabled()) {
+					userIHM.getUserPoa().getAvatar().id_piece = piece.id_est;
+					VirtualWorldFrame v = instance;
+					instance = new VirtualWorldFrame(userIHM);
+					v.dispose();
+				}
+			}
+
+			public void mouseEntered(MouseEvent arg0) {
+			}
+
+			public void mouseExited(MouseEvent arg0) {
+			}
+
+			public void mousePressed(MouseEvent arg0) {
+			}
+
+			public void mouseReleased(MouseEvent arg0) {
+			}
+		});
+		direction.add(jbEst);
 		worldPanelBottom.add(direction);
 		worldPanel.add(worldPanelBottom);
 

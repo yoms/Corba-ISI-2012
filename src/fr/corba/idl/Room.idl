@@ -31,6 +31,8 @@ module Code {
 	
 	struct Piece {
 		long id;
+		long posX;
+		long posY;
 		string nom;
 		long id_nord;
 		long id_sud;

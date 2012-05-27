@@ -60,10 +60,6 @@ public class AvatarsAdminPanel extends JPanel {
 					} catch (UnknownID e) {
 						JOptionPane.showMessageDialog(((JButton) event.getSource()).getRootPane(), "Cet utilisateur n'est pas connecté.", "Erreur à la déconnexion du compte", JOptionPane.ERROR_MESSAGE);
 					}
-					catch (Exception e) {
-						// TODO: handle exception
-						e.printStackTrace();
-					}
 					System.out.println("Kicked : " + table.getValueAt(table.getSelectedRow(), 0));
 				}
 			}

@@ -21,6 +21,8 @@ create table if not exists post (
 
 create table if not exists piece (
 	id 			integer primary key,
+	posX	 	int null,
+	posY 		int null,
 	nom 		varchar(45) null,
 	id_nord 	int null,
 	id_sud 		int null,
