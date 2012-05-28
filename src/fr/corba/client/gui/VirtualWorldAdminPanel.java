@@ -1,6 +1,5 @@
 package fr.corba.client.gui;
 
-import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.GridLayout;
 
@@ -22,7 +21,8 @@ public class VirtualWorldAdminPanel extends JPanel {
 		userIHM = u;
 		setLayout(new GridLayout(1, 0, 0, 0));
 
-		Canvas canvas = new Canvas();
+		WorldCanvas canvas = new WorldCanvas();
+		canvas.setPiece(userIHM.getServer().requestPieceContent(u.getUserPoa().getAvatar().id_piece));
 		add(canvas);
 
 		JPanel panel = new JPanel();

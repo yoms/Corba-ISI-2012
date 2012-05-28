@@ -40,10 +40,13 @@ import fr.corba.idl.Code.UnknownID;
 
 public class VirtualWorldFrame extends JFrame {
 	private static VirtualWorldFrame instance;
-	private Canvas canvas;
+	private WorldCanvas canvas;
 	private JTextField chatTextBox;
 	private Piece piece;
-
+	private JButton jbEst;
+	private JButton jbOuest;
+	private JButton jbSud;
+	private JButton jbNord;
 	private UserIHM userIHM;
 
 	public static VirtualWorldFrame getInstance(UserIHM u) {
@@ -120,30 +123,8 @@ public class VirtualWorldFrame extends JFrame {
 		panel.add(worldPanel);
 
 		worldPanel.setLayout(new BoxLayout(worldPanel, BoxLayout.Y_AXIS));
-		canvas = new Canvas() {
-			public void paint(Graphics g) {
-				this.setSize(new Dimension(400, 340));
-				int nbX = 3, nbY = 3;
-				int rectWitdh = 50, rectLength = 50;
-				int posX, posY = (this.getHeight() - (rectLength * nbY)) / 2;
-
-				for (int y = 0; y < 3; y++) {
-					posX = (this.getWidth() - (rectWitdh * nbX)) / 2;
-					for (int x = 0; x < 3; x++) {
-						// Les bordures sont noires
-						g.setColor(Color.black);
-						g.drawRect(posX, posY, rectWitdh, rectLength);
-						if (piece.posX == x && piece.posY == y) {
-							// Le contenu est vert
-							g.setColor(Color.green);
-							g.fillRect(posX + 1, posY + 1, rectWitdh - 1, rectLength - 1);
-						}
-						posX += rectWitdh;
-					}
-					posY += rectLength;
-				}
-			}
-		};
+		canvas = new WorldCanvas();
+		canvas.setPiece(piece);
 		canvas.setSize(new Dimension(400, 340));
 		canvas.setBackground(Color.WHITE);
 
@@ -202,113 +183,67 @@ public class VirtualWorldFrame extends JFrame {
 		JPanel direction = new JPanel();
 		direction.setLayout(new GridLayout(2, 3, 0, 0));
 		direction.add(new JPanel());
-		final JButton jbNord = new JButton("Nord");
-		if (this.piece.id_nord == 0)
-			jbNord.setEnabled(false);
-		jbNord.addMouseListener(new MouseListener() {
+		
+		MouseListener buttonListener = new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (jbNord.isEnabled()) {
-					userIHM.getUserPoa().getAvatar().id_piece = piece.id_nord;
-					VirtualWorldFrame v = instance;
-					instance = new VirtualWorldFrame(userIHM);
-					v.dispose();
+				if (e.getComponent().isEnabled()) {
+					if(e.getComponent() == jbEst)
+						userIHM.getUserPoa().getAvatar().id_piece = piece.id_est;
+					if(e.getComponent() == jbOuest)
+						userIHM.getUserPoa().getAvatar().id_piece = piece.id_ouest;
+					if(e.getComponent() == jbSud)
+						userIHM.getUserPoa().getAvatar().id_piece = piece.id_sud;
+					if(e.getComponent() == jbNord)
+						userIHM.getUserPoa().getAvatar().id_piece = piece.id_nord;
+					piece = userIHM.getServer().requestPieceContent(userIHM.getUserPoa().getAvatar().id_piece);
+					canvas.changePiece(piece);
+					updateButtonState();
+					
 				}
 			}
-
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
+		};
+		jbNord = new JButton("Nord");
+		jbNord.addMouseListener(buttonListener);
 		direction.add(jbNord);
 		direction.add(new JPanel());
 		
-		final JButton jbOuest = new JButton("Ouest");
-		if (this.piece.id_ouest == 0)
-			jbOuest.setEnabled(false);
-		jbOuest.addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) {
-				if (jbOuest.isEnabled()) {
-					userIHM.getUserPoa().getAvatar().id_piece = piece.id_ouest;
-					VirtualWorldFrame v = instance;
-					instance = new VirtualWorldFrame(userIHM);
-					v.dispose();
-				}
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
+		jbOuest = new JButton("Ouest");
+		jbOuest.addMouseListener(buttonListener);
 		direction.add(jbOuest);
 		
-		final JButton jbSud = new JButton("Sud");
-		if (this.piece.id_sud == 0)
-			jbSud.setEnabled(false);
-		jbSud.addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) {
-				if (jbSud.isEnabled()) {
-					userIHM.getUserPoa().getAvatar().id_piece = piece.id_sud;
-					VirtualWorldFrame v = instance;
-					instance = new VirtualWorldFrame(userIHM);
-					v.dispose();
-				}
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
+		jbSud = new JButton("Sud");
+		jbSud.addMouseListener(buttonListener);
 		direction.add(jbSud);
 		
-		final JButton jbEst = new JButton("Est");
-		if (this.piece.id_est == 0)
-			jbEst.setEnabled(false);
-		jbEst.addMouseListener(new MouseListener() {
-			public void mouseClicked(MouseEvent e) {
-				if (jbEst.isEnabled()) {
-					userIHM.getUserPoa().getAvatar().id_piece = piece.id_est;
-					VirtualWorldFrame v = instance;
-					instance = new VirtualWorldFrame(userIHM);
-					v.dispose();
-				}
-			}
-
-			public void mouseEntered(MouseEvent arg0) {
-			}
-
-			public void mouseExited(MouseEvent arg0) {
-			}
-
-			public void mousePressed(MouseEvent arg0) {
-			}
-
-			public void mouseReleased(MouseEvent arg0) {
-			}
-		});
+		jbEst = new JButton("Est");
+		jbEst.addMouseListener(buttonListener);
+		updateButtonState();
 		direction.add(jbEst);
 		worldPanelBottom.add(direction);
 		worldPanel.add(worldPanelBottom);
@@ -407,5 +342,13 @@ public class VirtualWorldFrame extends JFrame {
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
+	}
+	protected void updateButtonState()
+	{
+		jbNord.setEnabled(!(this.piece.id_nord == 0));
+		jbOuest.setEnabled(!(this.piece.id_ouest == 0));
+		jbSud.setEnabled(!(this.piece.id_sud == 0));
+		jbEst.setEnabled(!(this.piece.id_est == 0));
+		
 	}
 }

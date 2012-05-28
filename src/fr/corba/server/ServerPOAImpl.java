@@ -126,6 +126,7 @@ public class ServerPOAImpl extends ServerPOA {
 	@Override
 	public Avatar getAvatar(String nick) {
 		// TODO Auto-generated method stub
+		System.out.println("test");
 		return db.getAvatar(nick);
 	}
 
