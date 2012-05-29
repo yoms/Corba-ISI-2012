@@ -48,7 +48,7 @@ public class VirtualWorldFrame extends JFrame {
 	private JButton jbSud;
 	private JButton jbNord;
 	private UserIHM userIHM;
-
+	private JTable avatarTable;
 	public static VirtualWorldFrame getInstance(UserIHM u) {
 		if (instance == null)
 			instance = new VirtualWorldFrame(u);
@@ -145,21 +145,9 @@ public class VirtualWorldFrame extends JFrame {
 		JPanel worldPanelBottom = new JPanel();
 		worldPanelBottom.setLayout(new GridLayout(0, 2, 0, 0));
 
-		DefaultTableModel model = new DefaultTableModel() {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				// all cells false
-				return false;
-			}
-		};
-		model.addColumn("Avatars");
-		final Avatar avatars[] = this.piece.avatars;
-		for (Avatar attributs : avatars) {
-			String[] att = { attributs.pseudo };
-			model.addRow(att);
-		}
-		JTable table = new JTable(model) {
+		avatarTable = new JTable(createAvatarModel()) {
 			public String getToolTipText(MouseEvent e) {
+				Avatar avatars[] = piece.avatars;
 				String tip = "Error";
 				java.awt.Point p = e.getPoint();
 				int rowIndex = rowAtPoint(p);
@@ -175,9 +163,9 @@ public class VirtualWorldFrame extends JFrame {
 		};
 		DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
 		dtcr.setHorizontalAlignment(SwingConstants.CENTER);
-		table.getColumn("Avatars").setCellRenderer(dtcr);
-		table.setFillsViewportHeight(true);
-		JScrollPane scrollPane = new JScrollPane(table);
+		avatarTable.getColumn("Avatars").setCellRenderer(dtcr);
+		avatarTable.setFillsViewportHeight(true);
+		JScrollPane scrollPane = new JScrollPane(avatarTable);
 		worldPanelBottom.add(scrollPane);
 
 		JPanel direction = new JPanel();
@@ -224,7 +212,7 @@ public class VirtualWorldFrame extends JFrame {
 					piece = userIHM.getServer().requestPieceContent(userIHM.getUserPoa().getAvatar().id_piece);
 					canvas.changePiece(piece);
 					updateButtonState();
-					
+					avatarTable.setModel(createAvatarModel());
 				}
 			}
 		};
@@ -349,6 +337,24 @@ public class VirtualWorldFrame extends JFrame {
 		jbOuest.setEnabled(!(this.piece.id_ouest == 0));
 		jbSud.setEnabled(!(this.piece.id_sud == 0));
 		jbEst.setEnabled(!(this.piece.id_est == 0));
+		
+	}
+	protected DefaultTableModel createAvatarModel()
+	{
+		DefaultTableModel model = new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// all cells false
+				return false;
+			}
+		};
+		model.addColumn("Avatars");
+		Avatar avatars[] = this.piece.avatars;
+		for (Avatar attributs : avatars) {
+			String[] att = { attributs.pseudo };
+			model.addRow(att);
+		}
+		return model;
 		
 	}
 }
