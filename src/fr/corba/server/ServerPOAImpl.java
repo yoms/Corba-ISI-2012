@@ -120,14 +120,18 @@ public class ServerPOAImpl extends ServerPOA {
 	@Override
 	public Avatar getAvatar(String nick) {
 		// TODO Auto-generated method stub
-		System.out.println("test");
 		return db.getAvatar(nick);
 	}
 
 	@Override
-	public void requestMove(String nick, int idPiece) {
-		// TODO Auto-generated method stub
-		db.changePiece(nick, idPiece);
+	public void requestMove(String id, int idPiece) throws UnknownID {
+		Client from = clients.get(id);
+		if (from == null)
+			throw new UnknownID();
+		db.changePiece(from.nick, idPiece);
+		for (Client to : clients.values()) {
+			to.user.receiveMoved();
+		}
 	}
 
 }

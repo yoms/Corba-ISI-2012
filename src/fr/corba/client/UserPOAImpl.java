@@ -86,10 +86,9 @@ public class UserPOAImpl extends UserPOA {
 	}
 
 	@Override
-	public void receiveMoved(String nick, short x, short y) {
+	public void receiveMoved() {
 		// TODO Auto-generated method stub
-		System.out.println("receiveMoved(String nick, short x, short y)");
-
+		this.userIHM.updateAvatarTable();
 	}
 
 }

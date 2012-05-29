@@ -12,19 +12,19 @@ public class WorldCanvas extends Canvas {
 	static final int sizeY = 3;
 	private Piece piece;
 
-	public void setPiece(Piece p)
-	{
+	public void setPiece(Piece p) {
 		if (p.posX < sizeX && p.posY < sizeY) {
 			piece = p;
 		}
 	}
-	public void changePiece(Piece p)
-	{
+
+	public void changePiece(Piece p) {
 		if (p.posX < sizeX && p.posY < sizeY) {
 			piece = p;
 			update(this.getGraphics());
 		}
 	}
+
 	public void paint(Graphics g) {
 		this.setSize(new Dimension(400, 340));
 		int nbX = 3, nbY = 3;

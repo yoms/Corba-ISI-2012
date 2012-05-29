@@ -49,6 +49,7 @@ public class VirtualWorldFrame extends JFrame {
 	private JButton jbNord;
 	private UserIHM userIHM;
 	private JTable avatarTable;
+
 	public static VirtualWorldFrame getInstance(UserIHM u) {
 		if (instance == null)
 			instance = new VirtualWorldFrame(u);
@@ -148,7 +149,7 @@ public class VirtualWorldFrame extends JFrame {
 		avatarTable = new JTable(createAvatarModel()) {
 			public String getToolTipText(MouseEvent e) {
 				Avatar avatars[] = piece.avatars;
-				String tip = "Error";
+				String tip = "";
 				java.awt.Point p = e.getPoint();
 				int rowIndex = rowAtPoint(p);
 				int realRowIndex = convertRowIndexToModel(rowIndex);
@@ -171,49 +172,57 @@ public class VirtualWorldFrame extends JFrame {
 		JPanel direction = new JPanel();
 		direction.setLayout(new GridLayout(2, 3, 0, 0));
 		direction.add(new JPanel());
-		
+
 		MouseListener buttonListener = new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getComponent().isEnabled()) {
-					if(e.getComponent() == jbEst)
+					if (e.getComponent() == jbEst)
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_est;
-					if(e.getComponent() == jbOuest)
+					if (e.getComponent() == jbOuest)
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_ouest;
-					if(e.getComponent() == jbSud)
+					if (e.getComponent() == jbSud)
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_sud;
-					if(e.getComponent() == jbNord)
+					if (e.getComponent() == jbNord)
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_nord;
-					userIHM.getServer().requestMove(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().id_piece);
+					try {
+						userIHM.getServer().requestMove(UserRunnable.id, userIHM.getUserPoa().getAvatar().id_piece);
+					} catch (UnknownID e1) {
+						e1.printStackTrace();
+					}
 					piece = userIHM.getServer().requestPieceContent(userIHM.getUserPoa().getAvatar().id_piece);
 					canvas.changePiece(piece);
 					updateButtonState();
 					avatarTable.setModel(createAvatarModel());
+					DefaultTableCellRenderer dtcr = new DefaultTableCellRenderer();
+					dtcr.setHorizontalAlignment(SwingConstants.CENTER);
+					avatarTable.getColumn("Avatars").setCellRenderer(dtcr);
+					avatarTable.setFillsViewportHeight(true);
 				}
 			}
 		};
@@ -221,15 +230,15 @@ public class VirtualWorldFrame extends JFrame {
 		jbNord.addMouseListener(buttonListener);
 		direction.add(jbNord);
 		direction.add(new JPanel());
-		
+
 		jbOuest = new JButton("Ouest");
 		jbOuest.addMouseListener(buttonListener);
 		direction.add(jbOuest);
-		
+
 		jbSud = new JButton("Sud");
 		jbSud.addMouseListener(buttonListener);
 		direction.add(jbSud);
-		
+
 		jbEst = new JButton("Est");
 		jbEst.addMouseListener(buttonListener);
 		updateButtonState();
@@ -332,16 +341,28 @@ public class VirtualWorldFrame extends JFrame {
 			exp.printStackTrace();
 		}
 	}
-	protected void updateButtonState()
-	{
+
+	public JTable getAvatarTable() {
+		return avatarTable;
+	}
+
+	public void setPiece(Piece piece) {
+		this.piece = piece;
+	}
+
+	protected void updateButtonState() {
 		jbNord.setEnabled(!(this.piece.id_nord == 0));
 		jbOuest.setEnabled(!(this.piece.id_ouest == 0));
 		jbSud.setEnabled(!(this.piece.id_sud == 0));
 		jbEst.setEnabled(!(this.piece.id_est == 0));
-		
+
 	}
-	protected DefaultTableModel createAvatarModel()
-	{
+
+	public void updatePiece() {
+		this.piece = userIHM.getServer().requestPieceContent(userIHM.getUserPoa().getAvatar().id_piece);
+	}
+
+	public DefaultTableModel createAvatarModel() {
 		DefaultTableModel model = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int column) {
@@ -356,6 +377,6 @@ public class VirtualWorldFrame extends JFrame {
 			model.addRow(att);
 		}
 		return model;
-		
+
 	}
 }
