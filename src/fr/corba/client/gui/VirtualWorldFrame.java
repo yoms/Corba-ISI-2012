@@ -209,6 +209,7 @@ public class VirtualWorldFrame extends JFrame {
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_sud;
 					if(e.getComponent() == jbNord)
 						userIHM.getUserPoa().getAvatar().id_piece = piece.id_nord;
+					userIHM.getServer().requestMove(userIHM.getUserPoa().getAvatar().pseudo, userIHM.getUserPoa().getAvatar().id_piece);
 					piece = userIHM.getServer().requestPieceContent(userIHM.getUserPoa().getAvatar().id_piece);
 					canvas.changePiece(piece);
 					updateButtonState();

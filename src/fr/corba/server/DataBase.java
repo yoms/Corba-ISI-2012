@@ -163,6 +163,18 @@ public class DataBase {
 		return ret == 1;
 	}
 
+	public boolean changePiece(String nick, int idPiece) {
+		int ret = 0;
+		try {
+			Statement stat = conn.createStatement();
+			ret = stat.executeUpdate("update Avatar set id_piece = " + idPiece + " where pseudo = '" + nick + "'");
+			stat.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ret == 1;
+	}
+
 	public boolean existsInAvatar(String column, String value) {
 		try {
 			Statement stat = conn.createStatement();

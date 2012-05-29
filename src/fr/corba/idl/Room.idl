@@ -66,7 +66,7 @@ module Code {
 		void requestKick(in string nick) raises(UnknownID);
 		Avatar getAvatar(in string nick);
 		
-		void requestMove(in short x, in short y);
+		void requestMove(in string nick, in long idPiece);
 		void changePiece(in string myId);		
 		Piece requestPieceContent(in long idPiece);
 	};
