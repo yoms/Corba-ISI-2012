@@ -44,10 +44,23 @@ public class DataBase {
 		return false;
 	}
 
+	public boolean userExist (String nick) {
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select rowid from Avatar where pseudo = '" + nick + "';");
+			boolean ret = rs.next();
+			stat.close();
+			return ret;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	public String addUser(String[] values) {
 		String code_acces = this.generateCodeAcces();
 		try {
-			PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, '', ?, ?);");
+			PreparedStatement prep = conn.prepareStatement("insert into Avatar values (null, ?, ?, ?, ?, ?, '1', ?, ?);");
 
 			// pseudo
 			prep.setString(1, values[0]);
@@ -68,6 +81,7 @@ public class DataBase {
 			conn.setAutoCommit(false);
 			prep.executeBatch();
 			conn.setAutoCommit(true);
+			prep.close();
 		} catch (Exception e) {
 			System.out.println();
 			e.printStackTrace();

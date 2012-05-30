@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.NameAlreadyUsed;
@@ -64,10 +66,29 @@ public class ServerPOAImpl extends ServerPOA {
 		Client from = clients.get(id);
 		if (from == null)
 			throw new UnknownID();
-		System.out.println("comment: " + text + " by " + id + " [" + from.nick + "]");
-		for (Client to : clients.values()) {
-			to.user.receiveChatMessage(from.nick, text);
+		Pattern p = Pattern.compile("^[a-zA-Z0-9]{3,}:");
+	    Matcher m = p.matcher(text);
+	    
+	    // just try to find a match
+	    if (m.find())
+		{
+			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "] to martine");
+			for (Client to : clients.values()) {
+				System.out.println("Substring"+text.substring(0,text.indexOf(":")));
+				if(to.nick.equals(text.substring(0,text.indexOf(":"))))
+				{
+					System.out.println("eguals");
+					to.user.receiveChatMessage(from.nick, text);
+				}
+			}
 		}
+	    else
+	    {
+			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "]");
+			for (Client to : clients.values()) {
+				to.user.receiveChatMessage(from.nick, text);
+			}
+	    }
 	}
 
 	@Override
