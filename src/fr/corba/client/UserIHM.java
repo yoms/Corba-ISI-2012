@@ -228,4 +228,8 @@ public class UserIHM {
 		return true;
 	}
 
+	public void updateAvatarTable() {
+		this.chat.updatePiece();
+		this.chat.getAvatarTable().setModel(this.chat.createAvatarModel());
+	}
 }

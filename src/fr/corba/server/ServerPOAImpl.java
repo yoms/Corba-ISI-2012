@@ -127,12 +127,6 @@ public class ServerPOAImpl extends ServerPOA {
 	}
 
 	@Override
-	public void requestMove(short x, short y) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void changePiece(String myId) {
 		// TODO Auto-generated method stub
 
@@ -147,8 +141,18 @@ public class ServerPOAImpl extends ServerPOA {
 	@Override
 	public Avatar getAvatar(String nick) {
 		// TODO Auto-generated method stub
-		System.out.println("test");
 		return db.getAvatar(nick);
+	}
+
+	@Override
+	public void requestMove(String id, int idPiece) throws UnknownID {
+		Client from = clients.get(id);
+		if (from == null)
+			throw new UnknownID();
+		db.changePiece(from.nick, idPiece);
+		for (Client to : clients.values()) {
+			to.user.receiveMoved();
+		}
 	}
 
 }
