@@ -138,13 +138,12 @@ public class DataBase {
 	}
 
 	public Avatar getAvatar(String nick) {
-		Avatar avatar = new Avatar();
+		Avatar avatar = null;
 		try {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select id, pseudo, code_acces, taille, humeur, sexe, id_piece, est_admin, est_connecte from Avatar where pseudo ='" + nick + "';");
-			rs.next();
-			avatar = new Avatar(rs.getInt("id"), rs.getString("pseudo"), rs.getString("code_acces"), rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), rs.getBoolean("est_admin"), rs.getBoolean("est_connecte"));
-
+			if(rs.next())
+				avatar = new Avatar(rs.getInt("id"), rs.getString("pseudo"), rs.getString("code_acces"), rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), rs.getBoolean("est_admin"), rs.getBoolean("est_connecte"));
 			stat.close();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -6,6 +6,7 @@ module Code {
 	exception IdAlreadyUsed {};
 	exception NameAlreadyUsed {};
 	exception UnknownID {};
+	exception UnknownReciever {};
 	exception MessageStoredEmpty {};
 	exception WrongPassword {};
 	
@@ -63,7 +64,7 @@ module Code {
 		string subscribe(in string nick, in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
 		void unsubscribe(in string myId) raises (UnknownID);
 		PostList getStoredMessage(in string myId) raises (MessageStoredEmpty);
-		void comment(in string myId, in string text) raises (UnknownID);
+		void comment(in string myId, in string text) raises (UnknownID, UnknownReciever);
 		string addUser(in string nick, in string taille, in string humeur) raises (NameAlreadyUsed);
 		boolean isAdmin(in string nick, in string password);
 		Avatars requestExistingAvatars();		

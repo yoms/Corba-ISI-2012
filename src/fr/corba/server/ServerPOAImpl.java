@@ -16,6 +16,7 @@ import fr.corba.idl.Code.Piece;
 import fr.corba.idl.Code.Post;
 import fr.corba.idl.Code.ServerPOA;
 import fr.corba.idl.Code.UnknownID;
+import fr.corba.idl.Code.UnknownReciever;
 import fr.corba.idl.Code.User;
 import fr.corba.idl.Code.WrongPassword;
 
@@ -65,7 +66,7 @@ public class ServerPOAImpl extends ServerPOA {
 		nicks.remove(c.nick);
 	}
 
-	public void comment(String id, String text) throws UnknownID {
+	public void comment(String id, String text) throws UnknownID, UnknownReciever {
 		Client from = clients.get(id);
 		if (from == null)
 			throw new UnknownID();
@@ -78,8 +79,9 @@ public class ServerPOAImpl extends ServerPOA {
 			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "] to martine");
 			boolean clientConnected = false;
 			String name = text.substring(0,text.indexOf(":"));
+			if (db.getAvatar(name) == null)
+				throw new UnknownReciever();
 			for (Client to : clients.values()) {
-				System.out.println("Substring "+name);
 				if(to.nick.equals(name))
 				{
 					clientConnected = true;

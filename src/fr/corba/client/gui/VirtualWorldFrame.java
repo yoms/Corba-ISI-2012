@@ -40,6 +40,7 @@ import fr.corba.idl.Code.MessageStoredEmpty;
 import fr.corba.idl.Code.Piece;
 import fr.corba.idl.Code.Post;
 import fr.corba.idl.Code.UnknownID;
+import fr.corba.idl.Code.UnknownReciever;
 
 public class VirtualWorldFrame extends JFrame {
 	private static VirtualWorldFrame instance;
@@ -358,6 +359,8 @@ public class VirtualWorldFrame extends JFrame {
 			doc.insertString(doc.getLength(), "moi : \n", doc.getStyle("AEcrit"));
 			doc.insertString(doc.getLength(), chatTextBox.getText() + "\n", doc.getStyle("Ecrit"));
 			doc.insertString(doc.getLength(), time + "\n\n", doc.getStyle("Heure"));
+			chatTextBox.setText("");
+		} catch (UnknownReciever exp) {
 			chatTextBox.setText("");
 		} catch (Exception exp) {
 			exp.printStackTrace();
