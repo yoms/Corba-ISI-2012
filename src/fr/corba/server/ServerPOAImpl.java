@@ -9,6 +9,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import sun.org.mozilla.javascript.ast.FunctionNode.Form;
+
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.MessageStoredEmpty;
 import fr.corba.idl.Code.NameAlreadyUsed;
@@ -98,7 +100,8 @@ public class ServerPOAImpl extends ServerPOA {
 	    {
 			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "]");
 			for (Client to : clients.values()) {
-				to.user.receiveChatMessage(from.nick, text);
+				if(db.getAvatar(from.nick).id_piece == db.getAvatar(to.nick).id_piece)
+					to.user.receiveChatMessage(from.nick, text);
 			}
 	    }
 	}
