@@ -29,6 +29,7 @@ public class UserIHM {
 	private Thread userRunnableThread;
 	private Server server;
 	private User user;
+
 	private UserPOAImpl userPoa;
 
 	private VirtualWorldFrame chat;
@@ -124,6 +125,9 @@ public class UserIHM {
 		});
 	}
 
+	public User getUser() {
+		return user;
+	}
 	public Server getServer() {
 		return server;
 	}

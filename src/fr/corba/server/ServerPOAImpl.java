@@ -1,5 +1,6 @@
 package fr.corba.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fr.corba.idl.Code.Avatar;
+import fr.corba.idl.Code.MessageStoredEmpty;
 import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.Piece;
+import fr.corba.idl.Code.Post;
 import fr.corba.idl.Code.ServerPOA;
 import fr.corba.idl.Code.UnknownID;
 import fr.corba.idl.Code.User;
@@ -73,13 +76,20 @@ public class ServerPOAImpl extends ServerPOA {
 	    if (m.find())
 		{
 			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "] to martine");
+			boolean clientConnected = false;
+			String name = text.substring(0,text.indexOf(":"));
 			for (Client to : clients.values()) {
-				System.out.println("Substring"+text.substring(0,text.indexOf(":")));
-				if(to.nick.equals(text.substring(0,text.indexOf(":"))))
+				System.out.println("Substring "+name);
+				if(to.nick.equals(name))
 				{
+					clientConnected = true;
 					System.out.println("eguals");
 					to.user.receiveChatMessage(from.nick, text);
 				}
+			}
+			if(!clientConnected && db.userExist(name))
+			{
+				db.saveMessage(from.nick, name, text);
 			}
 		}
 	    else
@@ -153,6 +163,17 @@ public class ServerPOAImpl extends ServerPOA {
 		for (Client to : clients.values()) {
 			to.user.receiveMoved();
 		}
+	}
+
+	@Override
+	public Post[] getStoredMessage(String myId) throws MessageStoredEmpty {
+		ArrayList<Post> postArray = db.getMessagesStored(myId);
+		Post []posts = null;
+		if(postArray.size() == 0)
+			throw new MessageStoredEmpty();			
+		posts = new Post[postArray.size()];
+		postArray.toArray(posts);
+		return posts;
 	}
 
 }

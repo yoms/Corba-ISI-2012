@@ -28,6 +28,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -35,7 +36,9 @@ import javax.swing.text.StyledDocument;
 import fr.corba.client.UserIHM;
 import fr.corba.client.UserRunnable;
 import fr.corba.idl.Code.Avatar;
+import fr.corba.idl.Code.MessageStoredEmpty;
 import fr.corba.idl.Code.Piece;
+import fr.corba.idl.Code.Post;
 import fr.corba.idl.Code.UnknownID;
 
 public class VirtualWorldFrame extends JFrame {
@@ -275,7 +278,26 @@ public class VirtualWorldFrame extends JFrame {
 		StyleConstants.setFontSize(style, 10);
 
 		userIHM.getUserPoa().setChatHistory(chatHistory);
-		userIHM.getUserPoa().setChatHistory(chatHistory);
+		
+		try {
+			Post []posts = userIHM.getServer().getStoredMessage(String.valueOf(u.getUserPoa().getAvatar().id));
+			if(posts.length > 0)
+			{
+				for(Post p : posts)
+				{
+					StyledDocument doc1 = chatHistory.getStyledDocument();
+					try {
+						doc1.insertString(doc1.getLength(), p.pseudoEmetteur + " a écrit : \n", doc1.getStyle("AEcrit"));
+						doc1.insertString(doc1.getLength(), p.contenu + "\n", doc1.getStyle("Ecrit"));
+						doc1.insertString(doc1.getLength(), p.date_heure + "\n\n", doc1.getStyle("Heure"));
+					} catch (BadLocationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch (MessageStoredEmpty e1) {
+		}
 
 		JPanel sendPanel = new JPanel();
 		chatPanel.add(sendPanel);

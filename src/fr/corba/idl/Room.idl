@@ -6,6 +6,7 @@ module Code {
 	exception IdAlreadyUsed {};
 	exception NameAlreadyUsed {};
 	exception UnknownID {};
+	exception MessageStoredEmpty {};
 	exception WrongPassword {};
 	
 	struct Avatar {
@@ -24,10 +25,12 @@ module Code {
 	
 	struct Post {
 		long id;
+		string pseudoEmetteur;
 		string contenu;
 		string date_heure;
 		long id_avatar;
 	};
+	typedef sequence<Post> PostList;
 	
 	struct Piece {
 		long id;
@@ -59,6 +62,7 @@ module Code {
 	{
 		string subscribe(in string nick, in string password, in User c) raises (NameAlreadyUsed, WrongPassword);
 		void unsubscribe(in string myId) raises (UnknownID);
+		PostList getStoredMessage(in string myId) raises (MessageStoredEmpty);
 		void comment(in string myId, in string text) raises (UnknownID);
 		string addUser(in string nick, in string taille, in string humeur) raises (NameAlreadyUsed);
 		boolean isAdmin(in string nick, in string password);

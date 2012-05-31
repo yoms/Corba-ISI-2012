@@ -8,9 +8,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
+
+import javax.print.attribute.standard.DateTimeAtCompleted;
 
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.Piece;
+import fr.corba.idl.Code.Post;
 
 public class DataBase {
 	Connection conn;
@@ -329,5 +333,52 @@ public class DataBase {
 			e.printStackTrace();
 		}
 		return true;
+	}
+
+	public void saveMessage(String from, String to, String content) {
+		try {
+			Avatar avatar = getAvatar(to);
+			PreparedStatement prep = conn.prepareStatement("insert into post values (null, ?, ?, 'now', ?);");
+
+			prep.setString(1, from);
+			prep.setString(2, content);
+			prep.setInt(3, avatar.id);
+			prep.addBatch();
+
+			conn.setAutoCommit(false);
+			prep.executeBatch();
+			conn.setAutoCommit(true);
+			prep.close();
+		} catch (Exception e) {
+			System.out.println();
+			e.printStackTrace();
+		}
+	}
+	public ArrayList<Post> getMessagesStored(String id)
+	{
+		ArrayList<Post> posts = new ArrayList<Post>();
+		try {
+			Statement stat = conn.createStatement();
+			ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '"+id+"';");
+			while (rs.next()) {
+				int idPost = rs.getInt("id");
+				int avatarId = rs.getInt("id_avatar");
+				String nom = rs.getString("pseudoEmetteur");
+				String contenu = rs.getString("contenu");
+				Date date = rs.getDate("date_heure");
+				posts.add(new Post(idPost, nom, contenu, date.toString(), avatarId));
+			}
+			stat.close();
+			if(posts.size() > 0)
+			{
+				Statement st = conn.createStatement();
+				String sql = "DELETE FROM post WHERE id_avatar = '"+posts.get(0).id_avatar+"'";
+				st.executeUpdate(sql);
+				st.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return posts;
 	}
 }
