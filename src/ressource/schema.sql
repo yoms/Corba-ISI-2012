@@ -12,11 +12,11 @@ create table if not exists avatar (
 );
 
 create table if not exists post (
-	id 			integer primary key,
-	pseudoEmetteur 			varchar(45) not null,
-	contenu 	varchar(45) null,
-	date_heure 	datetime null,
-	id_avatar 	int null,
+	id 				integer primary key,
+	pseudoEmetteur 	varchar(45) not null,
+	contenu 		varchar(45) null,
+	date_heure 		datetime null,
+	id_avatar 		int null,
 	constraint fk_id_poster foreign key (id_avatar) references avatar (id)
 );
 

@@ -15,8 +15,8 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNaming.NamingContextExt;
 
 import fr.corba.client.gui.BienvenueFrame;
-import fr.corba.client.gui.VirtualWorldFrame;
 import fr.corba.client.gui.FormulaireFrame;
+import fr.corba.client.gui.VirtualWorldFrame;
 import fr.corba.idl.Code.NameAlreadyUsed;
 import fr.corba.idl.Code.Server;
 import fr.corba.idl.Code.ServerHelper;
@@ -128,6 +128,7 @@ public class UserIHM {
 	public User getUser() {
 		return user;
 	}
+
 	public Server getServer() {
 		return server;
 	}

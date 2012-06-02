@@ -1,9 +1,7 @@
 package fr.corba.client.gui;
 
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -11,7 +9,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.swing.BoxLayout;
@@ -137,7 +138,6 @@ public class VirtualWorldFrame extends JFrame {
 			JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 			getContentPane().add(tabbedPane);
 			tabbedPane.addTab("Jeu", null, panel, null);
-			tabbedPane.addTab("Monde virtuel", null, new VirtualWorldAdminPanel(userIHM), null);
 			tabbedPane.addTab("Avatars", null, new AvatarsAdminPanel(userIHM), null);
 		} else {
 			getContentPane().add(panel);
@@ -279,18 +279,25 @@ public class VirtualWorldFrame extends JFrame {
 		StyleConstants.setFontSize(style, 10);
 
 		userIHM.getUserPoa().setChatHistory(chatHistory);
-		
+
 		try {
-			Post []posts = userIHM.getServer().getStoredMessage(String.valueOf(u.getUserPoa().getAvatar().id));
-			if(posts.length > 0)
-			{
-				for(Post p : posts)
-				{
+			Post[] posts = userIHM.getServer().getStoredMessage(String.valueOf(u.getUserPoa().getAvatar().id));
+			if (posts.length > 0) {
+				for (Post p : posts) {
 					StyledDocument doc1 = chatHistory.getStyledDocument();
 					try {
+						Date date = null;
+						try {
+							SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							ParsePosition pos = new ParsePosition(0);
+							date = formatter.parse(p.date_heure, pos);
+						} catch (RuntimeException e) {
+							e.printStackTrace();
+						}
+
 						doc1.insertString(doc1.getLength(), p.pseudoEmetteur + " a écrit : \n", doc1.getStyle("AEcrit"));
 						doc1.insertString(doc1.getLength(), p.contenu + "\n", doc1.getStyle("Ecrit"));
-						doc1.insertString(doc1.getLength(), p.date_heure + "\n\n", doc1.getStyle("Heure"));
+						doc1.insertString(doc1.getLength(), date + "\n\n", doc1.getStyle("Heure"));
 					} catch (BadLocationException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

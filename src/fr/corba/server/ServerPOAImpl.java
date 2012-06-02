@@ -9,8 +9,6 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sun.org.mozilla.javascript.ast.FunctionNode.Form;
-
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.MessageStoredEmpty;
 import fr.corba.idl.Code.NameAlreadyUsed;
@@ -73,37 +71,32 @@ public class ServerPOAImpl extends ServerPOA {
 		if (from == null)
 			throw new UnknownID();
 		Pattern p = Pattern.compile("^[a-zA-Z0-9]{3,}:");
-	    Matcher m = p.matcher(text);
-	    
-	    // just try to find a match
-	    if (m.find())
-		{
-			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "] to martine");
+		Matcher m = p.matcher(text);
+
+		// just try to find a match
+		if (m.find()) {
 			boolean clientConnected = false;
-			String name = text.substring(0,text.indexOf(":"));
+			String name = text.substring(0, text.indexOf(":"));
+			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "] to " + name);
 			if (db.getAvatar(name) == null)
 				throw new UnknownReciever();
 			for (Client to : clients.values()) {
-				if(to.nick.equals(name))
-				{
+				if (to.nick.equals(name)) {
 					clientConnected = true;
-					System.out.println("eguals");
+					System.out.println("found");
 					to.user.receiveChatMessage(from.nick, text);
 				}
 			}
-			if(!clientConnected && db.userExist(name))
-			{
+			if (!clientConnected && db.userExist(name)) {
 				db.saveMessage(from.nick, name, text);
 			}
-		}
-	    else
-	    {
+		} else {
 			System.out.println("comment: " + text + " by " + id + " [" + from.nick + "]");
 			for (Client to : clients.values()) {
-				if(db.getAvatar(from.nick).id_piece == db.getAvatar(to.nick).id_piece)
+				if (db.getAvatar(from.nick).id_piece == db.getAvatar(to.nick).id_piece)
 					to.user.receiveChatMessage(from.nick, text);
 			}
-	    }
+		}
 	}
 
 	@Override
@@ -173,9 +166,9 @@ public class ServerPOAImpl extends ServerPOA {
 	@Override
 	public Post[] getStoredMessage(String myId) throws MessageStoredEmpty {
 		ArrayList<Post> postArray = db.getMessagesStored(myId);
-		Post []posts = null;
-		if(postArray.size() == 0)
-			throw new MessageStoredEmpty();			
+		Post[] posts = null;
+		if (postArray.size() == 0)
+			throw new MessageStoredEmpty();
 		posts = new Post[postArray.size()];
 		postArray.toArray(posts);
 		return posts;

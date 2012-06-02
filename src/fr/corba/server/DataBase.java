@@ -8,9 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-
-import javax.print.attribute.standard.DateTimeAtCompleted;
 
 import fr.corba.idl.Code.Avatar;
 import fr.corba.idl.Code.Piece;
@@ -25,8 +22,8 @@ public class DataBase {
 			conn = DriverManager.getConnection("jdbc:sqlite:corba.db");
 			if (createDataBase())
 				System.out.println("DataBase created");
-			if (createAdmins())
-				System.out.println("Admins added");
+			if (createUsers())
+				System.out.println("Users added");
 			if (createRooms())
 				System.out.println("Rooms added");
 		} catch (Exception e) {
@@ -48,7 +45,7 @@ public class DataBase {
 		return false;
 	}
 
-	public boolean userExist (String nick) {
+	public boolean userExist(String nick) {
 		try {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select rowid from Avatar where pseudo = '" + nick + "';");
@@ -142,7 +139,7 @@ public class DataBase {
 		try {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select id, pseudo, code_acces, taille, humeur, sexe, id_piece, est_admin, est_connecte from Avatar where pseudo ='" + nick + "';");
-			if(rs.next())
+			if (rs.next())
 				avatar = new Avatar(rs.getInt("id"), rs.getString("pseudo"), rs.getString("code_acces"), rs.getString("taille"), rs.getString("humeur"), rs.getString("sexe"), rs.getInt("id_piece"), rs.getBoolean("est_admin"), rs.getBoolean("est_connecte"));
 			stat.close();
 		} catch (Exception e) {
@@ -246,7 +243,7 @@ public class DataBase {
 		return true;
 	}
 
-	private boolean createAdmins() {
+	private boolean createUsers() {
 		try {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select * from Avatar where pseudo = 'yoms';");
@@ -270,6 +267,16 @@ public class DataBase {
 				prep.setString(5, "Masculin");
 				prep.setInt(6, 1);
 				prep.setInt(7, 1);
+				prep.setInt(8, 0);
+				prep.addBatch();
+
+				prep.setString(1, "bob");
+				prep.setString(2, "bob");
+				prep.setString(3, "Grand");
+				prep.setString(4, "Nouveau");
+				prep.setString(5, "Masculin");
+				prep.setInt(6, 1);
+				prep.setInt(7, 0);
 				prep.setInt(8, 0);
 				prep.addBatch();
 
@@ -337,7 +344,7 @@ public class DataBase {
 	public void saveMessage(String from, String to, String content) {
 		try {
 			Avatar avatar = getAvatar(to);
-			PreparedStatement prep = conn.prepareStatement("insert into post values (null, ?, ?, 'now', ?);");
+			PreparedStatement prep = conn.prepareStatement("insert into post values (null, ?, ?, DATETIME('NOW'), ?);");
 
 			prep.setString(1, from);
 			prep.setString(2, content);
@@ -353,25 +360,24 @@ public class DataBase {
 			e.printStackTrace();
 		}
 	}
-	public ArrayList<Post> getMessagesStored(String id)
-	{
+
+	public ArrayList<Post> getMessagesStored(String id) {
 		ArrayList<Post> posts = new ArrayList<Post>();
 		try {
 			Statement stat = conn.createStatement();
-			ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '"+id+"';");
+			ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '" + id + "';");
 			while (rs.next()) {
 				int idPost = rs.getInt("id");
 				int avatarId = rs.getInt("id_avatar");
 				String nom = rs.getString("pseudoEmetteur");
 				String contenu = rs.getString("contenu");
-				Date date = rs.getDate("date_heure");
-				posts.add(new Post(idPost, nom, contenu, date.toString(), avatarId));
+				String date = rs.getString("date_heure");
+				posts.add(new Post(idPost, nom, contenu, date, avatarId));
 			}
 			stat.close();
-			if(posts.size() > 0)
-			{
+			if (posts.size() > 0) {
 				Statement st = conn.createStatement();
-				String sql = "DELETE FROM post WHERE id_avatar = '"+posts.get(0).id_avatar+"'";
+				String sql = "DELETE FROM post WHERE id_avatar = '" + posts.get(0).id_avatar + "'";
 				st.executeUpdate(sql);
 				st.close();
 			}
