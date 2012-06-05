@@ -362,12 +362,14 @@ public class DataBase {
 	}
 
 	public ArrayList<Post> getMessagesStored(String id) {
+		System.out.println("getMessagesStored");
 		ArrayList<Post> posts = new ArrayList<Post>();
 		try {
 			Statement stat = conn.createStatement();
 			ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '" + id + "';");
 			while (rs.next()) {
 				int idPost = rs.getInt("id");
+				System.out.println("id "+idPost);
 				int avatarId = rs.getInt("id_avatar");
 				String nom = rs.getString("pseudoEmetteur");
 				String contenu = rs.getString("contenu");

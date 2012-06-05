@@ -1,0 +1,1 @@
+wsimport -d bin -s src -p ws.client http://localhost:8080/ws/MyService?wsdl
