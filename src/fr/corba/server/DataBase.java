@@ -369,7 +369,7 @@ public class DataBase {
 			ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '" + id + "';");
 			while (rs.next()) {
 				int idPost = rs.getInt("id");
-				System.out.println("id "+idPost);
+				System.out.println("id " + idPost);
 				int avatarId = rs.getInt("id_avatar");
 				String nom = rs.getString("pseudoEmetteur");
 				String contenu = rs.getString("contenu");
@@ -382,6 +382,32 @@ public class DataBase {
 				String sql = "DELETE FROM post WHERE id_avatar = '" + posts.get(0).id_avatar + "'";
 				st.executeUpdate(sql);
 				st.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return posts;
+	}
+
+	public ArrayList<Post> getStored(String nick, String password) {
+		System.out.println("getStored");
+		ArrayList<Post> posts = null;
+		try {
+			if (verifyUser(nick, password)) {
+				posts = new ArrayList<Post>();
+				Avatar avatar = getAvatar(nick);
+				Statement stat = conn.createStatement();
+				ResultSet rs = stat.executeQuery("select id, pseudoEmetteur, contenu, date_heure, id_avatar from post where id_avatar = '" + avatar.id + "';");
+				while (rs.next()) {
+					int idPost = rs.getInt("id");
+					System.out.println("id " + idPost);
+					int avatarId = rs.getInt("id_avatar");
+					String nom = rs.getString("pseudoEmetteur");
+					String contenu = rs.getString("contenu");
+					String date = rs.getString("date_heure");
+					posts.add(new Post(idPost, nom, contenu, date, avatarId));
+				}
+				stat.close();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

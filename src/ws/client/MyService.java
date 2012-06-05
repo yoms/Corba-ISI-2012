@@ -27,6 +27,7 @@ public interface MyService {
 
     /**
      * 
+     * @param arg1
      * @param arg0
      * @return
      *     returns java.util.List<ws.client.Post>
@@ -38,21 +39,8 @@ public interface MyService {
     @Action(input = "http://server.ws/MyService/getMessagesRequest", output = "http://server.ws/MyService/getMessagesResponse")
     public List<Post> getMessages(
         @WebParam(name = "arg0", targetNamespace = "")
-        String arg0);
-
-    /**
-     * 
-     * @param arg0
-     * @return
-     *     returns int
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getTemperature", targetNamespace = "http://server.ws/", className = "ws.client.GetTemperature")
-    @ResponseWrapper(localName = "getTemperatureResponse", targetNamespace = "http://server.ws/", className = "ws.client.GetTemperatureResponse")
-    @Action(input = "http://server.ws/MyService/getTemperatureRequest", output = "http://server.ws/MyService/getTemperatureResponse")
-    public int getTemperature(
-        @WebParam(name = "arg0", targetNamespace = "")
-        String arg0);
+        String arg0,
+        @WebParam(name = "arg1", targetNamespace = "")
+        String arg1);
 
 }

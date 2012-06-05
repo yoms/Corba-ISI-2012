@@ -24,8 +24,6 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _GetTemperature_QNAME = new QName("http://server.ws/", "getTemperature");
-    private final static QName _GetTemperatureResponse_QNAME = new QName("http://server.ws/", "getTemperatureResponse");
     private final static QName _GetMessagesResponse_QNAME = new QName("http://server.ws/", "getMessagesResponse");
     private final static QName _GetMessages_QNAME = new QName("http://server.ws/", "getMessages");
 
@@ -45,22 +43,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetTemperature }
-     * 
-     */
-    public GetTemperature createGetTemperature() {
-        return new GetTemperature();
-    }
-
-    /**
-     * Create an instance of {@link GetTemperatureResponse }
-     * 
-     */
-    public GetTemperatureResponse createGetTemperatureResponse() {
-        return new GetTemperatureResponse();
-    }
-
-    /**
      * Create an instance of {@link GetMessages }
      * 
      */
@@ -74,24 +56,6 @@ public class ObjectFactory {
      */
     public Post createPost() {
         return new Post();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetTemperature }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://server.ws/", name = "getTemperature")
-    public JAXBElement<GetTemperature> createGetTemperature(GetTemperature value) {
-        return new JAXBElement<GetTemperature>(_GetTemperature_QNAME, GetTemperature.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetTemperatureResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://server.ws/", name = "getTemperatureResponse")
-    public JAXBElement<GetTemperatureResponse> createGetTemperatureResponse(GetTemperatureResponse value) {
-        return new JAXBElement<GetTemperatureResponse>(_GetTemperatureResponse_QNAME, GetTemperatureResponse.class, null, value);
     }
 
     /**

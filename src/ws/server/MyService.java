@@ -12,17 +12,8 @@ import fr.corba.server.DataBase;
 public class MyService {
 	private DataBase db = new DataBase();
 
-	public List<Post> getMessages(String id) {
-		return db.getMessagesStored(id);
-	}
-
-	public int getTemperature(String city) {
-		if (city.equals("Toulouse")) {
-			return 20;
-		} else if (city.equals("Paris")) {
-			return 15;
-		}
-		return Integer.MIN_VALUE;
+	public List<Post> getMessages(String nick, String password) {
+		return db.getStored(nick, password);
 	}
 
 	public static void main(String[] args) {
